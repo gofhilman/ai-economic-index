@@ -1,9 +1,0 @@
-id: gc_kv
-namespace: ai_economic_index
-
-tasks:
-  - id: gc_dataset
-    type: io.kestra.plugin.core.kv.Set
-    key: GC_DATASET
-    kvType: STRING
-    value: ai_economic_index

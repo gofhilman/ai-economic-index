@@ -1,0 +1,43 @@
+id: gc_el
+namespace: ai_economic_index
+
+variables:
+  base_url_2026: "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/main/release_2026_01_15/data/intermediate"
+  base_url_2025: "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/main/release_2025_09_15/data"
+  files:
+    - url: "{{ vars.base_url_2026 }}/aei_raw_claude_ai_2025-11-13_to_2025-11-20.csv?download=true"
+      filename: "aei_raw_claude_ai_2025-11-13_to_2025-11-20.csv"
+    - url: "{{ vars.base_url_2025 }}/intermediate/aei_raw_claude_ai_2025-08-04_to_2025-08-11.csv?download=true"
+      filename: "aei_raw_claude_ai_2025-08-04_to_2025-08-11.csv"
+    - url: "{{ vars.base_url_2025 }}/input/task_pct_v1.csv?download=true"
+      filename: "task_pct_v1.csv"
+    - url: "{{ vars.base_url_2025 }}/input/task_pct_v2.csv?download=true"
+      filename: "task_pct_v2.csv"
+    - url: "{{ vars.base_url_2025 }}/input/automation_vs_augmentation_v1.csv?download=true"
+      filename: "automation_vs_augmentation_v1.csv"
+    - url: "{{ vars.base_url_2025 }}/input/automation_vs_augmentation_v2.csv?download=true"
+      filename: "automation_vs_augmentation_v2.csv"
+
+tasks:
+  - id: set_labels
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      source: huggingface
+      dataset: EconomicIndex
+
+  - id: download_and_upload
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "{{ render(vars.files) }}"
+    tasks:
+      - id: download
+        type: io.kestra.plugin.core.http.Download
+        uri: "{{ json(taskrun.value).url }}"
+
+      - id: upload
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{ outputs.download[taskrun.value].uri }}"
+        to: "gs://{{ kv('GC_BUCKET_NAME') }}/{{ json(taskrun.value).filename }}"
+        projectId: "{{ kv('GC_PROJECT_ID') }}"
+
+  - id: purge_execution_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles

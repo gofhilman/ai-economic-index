@@ -1,0 +1,38 @@
+id: gc_external_data
+namespace: ai_economic_index
+
+description: |
+  Uploads all files found in /external-data to GCS.
+  Destination: gs://<GC_BUCKET_NAME>/external-data/<file>
+
+  Prerequisites:
+    - KV store key "GC_BUCKET_NAME" must be set in Kestra
+    - KV store key "GC_PROJECT_ID" must be set in Kestra
+
+tasks:
+  - id: upload_files
+    type: io.kestra.plugin.scripts.python.Script
+    beforeCommands:
+      - pip install google-cloud-storage -q
+    script: |
+      import os
+      from google.cloud import storage
+
+      bucket_name = "{{ kv('GC_BUCKET_NAME') }}"
+      project_id = "{{ kv('GC_PROJECT_ID') }}"
+      source_dir = "/external-data"
+
+      client = storage.Client(project=project_id)
+      bucket = client.bucket(bucket_name)
+
+      files = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f))]
+
+      if not files:
+          print("No files found in /external-data")
+      else:
+          for filename in files:
+              filepath = os.path.join(source_dir, filename)
+              destination = f"external-data/{filename}"
+              blob = bucket.blob(destination)
+              blob.upload_from_filename(filepath)
+              print(f"Uploaded: {filepath} -> gs://{bucket_name}/{destination}")

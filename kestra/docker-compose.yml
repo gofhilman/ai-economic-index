@@ -60,6 +60,7 @@ services:
       - /tmp/kestra-wd:/tmp/kestra-wd
       - ./flows:/flows
       - ./scripts:/scripts
+      - ./external-data:/external-data
       - ~/.config/gcloud:/root/.config/gcloud:ro
     environment:
       KESTRA_CONFIGURATION: |
