@@ -1,38 +1,100 @@
 id: gc_external_data
 namespace: ai_economic_index
 
-description: |
-  Uploads all files found in /external-data to GCS.
-  Destination: gs://<GC_BUCKET_NAME>/external-data/<file>
-
-  Prerequisites:
-    - KV store key "GC_BUCKET_NAME" must be set in Kestra
-    - KV store key "GC_PROJECT_ID" must be set in Kestra
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GC_SERVICE_ACCOUNT') }}"
+      projectId: "{{ kv('GC_PROJECT_ID') }}"
+      location: "{{ kv('GC_LOCATION') }}"
+      bucket: "{{ kv('GC_BUCKET_NAME') }}"
 
 tasks:
-  - id: upload_files
+  - id: create_dataset
+    type: io.kestra.plugin.gcp.bigquery.CreateDataset
+    name: "{{ kv('GC_EXTERNAL_DATASET') }}"
+    ifExists: SKIP
+
+  - id: process_files
     type: io.kestra.plugin.scripts.python.Script
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
     beforeCommands:
-      - pip install google-cloud-storage -q
+      - pip install google-cloud-bigquery google-cloud-storage --quiet
+    env:
+      GC_SERVICE_ACCOUNT: "{{ secret('GC_SERVICE_ACCOUNT') }}"
+      GC_PROJECT_ID: "{{ kv('GC_PROJECT_ID') }}"
+      GC_LOCATION: "{{ kv('GC_LOCATION') }}"
+      GC_BUCKET_NAME: "{{ kv('GC_BUCKET_NAME') }}"
+      GC_EXTERNAL_DATASET: "{{ kv('GC_EXTERNAL_DATASET') }}"
     script: |
       import os
-      from google.cloud import storage
+      import json
+      import glob
+      from google.cloud import bigquery, storage
+      from google.oauth2 import service_account
 
-      bucket_name = "{{ kv('GC_BUCKET_NAME') }}"
-      project_id = "{{ kv('GC_PROJECT_ID') }}"
-      source_dir = "/external-data"
+      # ── Auth ──────────────────────────────────────────────────────────────────
+      sa_info      = json.loads(os.environ["GC_SERVICE_ACCOUNT"])
+      credentials  = service_account.Credentials.from_service_account_info(sa_info)
 
-      client = storage.Client(project=project_id)
-      bucket = client.bucket(bucket_name)
+      project_id   = os.environ["GC_PROJECT_ID"]
+      location     = os.environ["GC_LOCATION"]
+      bucket_name  = os.environ["GC_BUCKET_NAME"]
+      dataset_id   = os.environ["GC_EXTERNAL_DATASET"]
 
-      files = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f))]
+      bq_client    = bigquery.Client(project=project_id, credentials=credentials, location=location)
+      gcs_client   = storage.Client(project=project_id, credentials=credentials)
+      bucket       = gcs_client.bucket(bucket_name)
 
-      if not files:
-          print("No files found in /external-data")
-      else:
-          for filename in files:
-              filepath = os.path.join(source_dir, filename)
-              destination = f"external-data/{filename}"
-              blob = bucket.blob(destination)
-              blob.upload_from_filename(filepath)
-              print(f"Uploaded: {filepath} -> gs://{bucket_name}/{destination}")
+      # ── File type config ──────────────────────────────────────────────────────
+      FILE_CONFIG = {
+          ".csv": ",",
+          ".txt": "|",
+      }
+
+      # ── Discover files directly from mounted volume ───────────────────────────
+      all_files = glob.glob("/external-data/**/*.*", recursive=True) + \
+                  glob.glob("/external-data/*.*")
+      all_files = list(set(all_files))
+
+      supported_files = [f for f in all_files if os.path.splitext(f)[1].lower() in FILE_CONFIG]
+
+      if not supported_files:
+          print("[!] No supported files (.csv, .txt) found in /external-data/")
+
+      # ── Process each file ─────────────────────────────────────────────────────
+      for local_path in supported_files:
+          filename   = os.path.basename(local_path)
+          ext        = os.path.splitext(filename)[1].lower()
+          table_name = os.path.splitext(filename)[0]
+          delimiter  = FILE_CONFIG[ext]
+          gcs_path   = f"external-data/{filename}"
+          gcs_uri    = f"gs://{bucket_name}/{gcs_path}"
+          table_ref  = f"{project_id}.{dataset_id}.{table_name}"
+
+          # Upload to GCS ───────────────────────────────────────────────────────
+          blob = bucket.blob(gcs_path)
+          blob.upload_from_filename(local_path)
+          print(f"[✓] Uploaded  '{filename}'  →  {gcs_uri}")
+
+          # Load into BigQuery ──────────────────────────────────────────────────
+          job_config = bigquery.LoadJobConfig(
+              source_format      = bigquery.SourceFormat.CSV,
+              field_delimiter    = delimiter,
+              skip_leading_rows  = 1,
+              autodetect         = True,
+              write_disposition  = bigquery.WriteDisposition.WRITE_TRUNCATE,
+              create_disposition = bigquery.CreateDisposition.CREATE_IF_NEEDED,
+              column_name_character_map = "V2"
+          )
+
+          load_job = bq_client.load_table_from_uri(
+              gcs_uri,
+              table_ref,
+              job_config=job_config,
+          )
+          load_job.result()
+          print(f"[✓] Loaded    {gcs_uri}  →  '{table_ref}'  (delimiter='{delimiter}')")
+
+      print("\n[✓] All files processed.")

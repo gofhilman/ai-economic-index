@@ -8,14 +8,32 @@ tasks:
     kvType: STRING
     value: ai-economic-index
 
+  - id: gc_location
+    type: io.kestra.plugin.core.kv.Set
+    key: GC_LOCATION
+    kvType: STRING
+    value: asia-southeast2
+
+  - id: gc_zone
+    type: io.kestra.plugin.core.kv.Set
+    key: GC_ZONE
+    kvType: STRING
+    value: asia-southeast2-a
+
   - id: gc_bucket_name
     type: io.kestra.plugin.core.kv.Set
     key: GC_BUCKET_NAME
     kvType: STRING
     value: ai-economic-index
 
-  - id: gc_dataset
+  - id: gc_raw_dataset
     type: io.kestra.plugin.core.kv.Set
-    key: GC_DATASET
+    key: GC_RAW_DATASET
     kvType: STRING
-    value: ai_economic_index
+    value: raw_dataset
+  
+  - id: gc_external_dataset
+    type: io.kestra.plugin.core.kv.Set
+    key: GC_EXTERNAL_DATASET
+    kvType: STRING
+    value: external_dataset

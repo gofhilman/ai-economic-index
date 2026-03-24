@@ -1,0 +1,32 @@
+id: gc_terraform
+namespace: ai_economic_index
+
+description: |
+  This flow uses the Terraform CLI to manage a Google Cloud Storage bucket. 
+  Variables are injected directly into the Terraform configuration using Kestra KV store. 
+  Credentials are provided via the 'GC_SERVICE_ACCOUNT' secret. 
+  Ensure that the keys 'project', 'region', 'zone', 'gc_bucket_name', and 'location' 
+  are defined in the 'ai_economic_index' namespace in the KV Store.
+
+tasks:
+  - id: terraform
+    type: io.kestra.plugin.terraform.cli.TerraformCLI
+    beforeCommands:
+      - terraform init
+    inputFiles:
+      main.tf: |        
+        provider "google" {
+          project = "{{ kv('GC_PROJECT_ID') }}"
+          region  = "{{ kv('GC_LOCATION') }}"
+          zone    = "{{ kv('GC_ZONE') }}"
+        }
+
+        resource "google_storage_bucket" "bucket" {
+          name          = "{{ kv('GC_BUCKET_NAME') }}"
+          location      = "{{ kv('GC_LOCATION') }}"
+        }
+    env:
+      GOOGLE_CREDENTIALS: "{{ secret('GC_SERVICE_ACCOUNT') }}"
+    commands:
+      - terraform plan
+      - terraform apply -auto-approve

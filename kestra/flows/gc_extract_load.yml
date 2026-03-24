@@ -1,6 +1,14 @@
 id: gc_el
 namespace: ai_economic_index
 
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GC_SERVICE_ACCOUNT') }}"
+      projectId: "{{ kv('GC_PROJECT_ID') }}"
+      location: "{{ kv('GC_LOCATION') }}"
+      bucket: "{{ kv('GC_BUCKET_NAME') }}"
+
 variables:
   base_url_2026: "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/main/release_2026_01_15/data/intermediate"
   base_url_2025: "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/main/release_2025_09_15/data"
@@ -25,7 +33,12 @@ tasks:
       source: huggingface
       dataset: EconomicIndex
 
-  - id: download_and_upload
+  - id: create_dataset
+    type: io.kestra.plugin.gcp.bigquery.CreateDataset
+    name: "{{ kv('GC_RAW_DATASET') }}"
+    ifExists: SKIP
+
+  - id: download_upload_load
     type: io.kestra.plugin.core.flow.ForEach
     values: "{{ render(vars.files) }}"
     tasks:
@@ -37,7 +50,22 @@ tasks:
         type: io.kestra.plugin.gcp.gcs.Upload
         from: "{{ outputs.download[taskrun.value].uri }}"
         to: "gs://{{ kv('GC_BUCKET_NAME') }}/{{ json(taskrun.value).filename }}"
-        projectId: "{{ kv('GC_PROJECT_ID') }}"
+
+      - id: load_to_bq
+        type: io.kestra.plugin.gcp.bigquery.LoadFromGcs
+        from:
+          - "{{ outputs.upload[taskrun.value].uri }}"
+        destinationTable: "{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_RAW_DATASET') }}.{{ json(taskrun.value).filename
+            | replace({'.csv': ''})
+            | replace({'-': '_'})
+          }}"
+        format: CSV
+        autodetect: true
+        writeDisposition: WRITE_TRUNCATE
+        csvOptions:
+          allowQuotedNewLines: true
+          fieldDelimiter: ","
+          skipLeadingRows: 1
 
   - id: purge_execution_files
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
