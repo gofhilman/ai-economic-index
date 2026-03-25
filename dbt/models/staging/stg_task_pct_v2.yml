@@ -1,0 +1,11 @@
+models:
+  - name: stg_task_pct_v2
+    description: "Data on task usage patterns from the second Anthropic Economic Index report"
+    columns:
+      - name: task_name
+        data_type: string
+        description: "Normalized name of the task"
+
+      - name: pct
+        data_type: float64
+        description: "Percentage of task prevalence in dataset"

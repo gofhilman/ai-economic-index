@@ -1,0 +1,90 @@
+models:
+  - name: stg_aei_raw_claude_ai_2025_08_04_to_2025_08_11
+    description: "Claude.ai usage metrics aggregated by geography and analysis dimensions (facets) taken from 2025-08-04 to 2025-08-11"
+    columns:
+      - name: geo_id
+        data_type: string
+        description: >
+          Geographic identifier (ISO-3166-1 country code for countries, ISO 3166-2 region code for country-state, or "GLOBAL"). 
+          Examples: "USA", "AGO-LUA" (Angola-Luanda), "ALB-02" (Albania-Fier) (raw version uses 2- instead of 3-letter country codes)
+
+      - name: geography
+        data_type: string
+        description: >
+          Geographic level: "country", "country-state", or "global"
+
+      - name: date_start
+        data_type: date
+        description: Start of data collection period
+
+      - name: date_end
+        data_type: date
+        description: End of data collection period
+
+      - name: platform_and_product
+        data_type: string
+        description: "Claude AI (Free and Pro)"
+
+      - name: facet
+        data_type: string
+        description: |
+          Analysis dimension:
+          - **country**: Country-level aggregations
+          - **state_us**: US state-level aggregations
+          - **onet_task**: O*NET occupational tasks
+          - **collaboration**: Human-AI collaboration patterns
+          - **request**: Request complexity levels (0=highest granularity, 1=middle granularity, 2=lowest granularity)
+          - **onet_task::collaboration**: Intersection of tasks and collaboration patterns
+          - **request::collaboration**: Intersection of request categories and collaboration patterns
+          
+      - name: level
+        data_type: int64
+        description: Sub-level within facet (0-2)
+
+      - name: variable
+        data_type: string
+        description: |
+          Metric name:
+          # Usage Metrics
+          - **usage_count**: Total number of conversations/interactions in a geography
+          - **usage_pct**: Percentage of total usage (relative to parent geography - gobal for countries, US for states)
+          - **usage_per_capita**: Usage count divided by working age population
+          - **usage_per_capita_index**: Concentration index showing if a geography has more/less usage than expected based on population share (1.0 = proportional, >1.0 = over-representation, <1.0 = under-representation)
+          - **usage_tier**: Usage adoption tier (0 = no/little adoption, 1-4 = quartiles of adoption among geographies with sufficient usage)
+
+          # Content Facet Metrics
+          **O*NET Task Metrics**:
+          - **onet_task_count**: Number of conversations using this specific O*NET task
+          - **onet_task_pct**: Percentage of geographic total using this task
+          - **onet_task_pct_index**: Specialization index comparing task usage to baseline (global for countries, US for states)
+          - **onet_task_collaboration_count**: Number of conversations with both this task and collaboration pattern (intersection)
+          - **onet_task_collaboration_pct**: Percentage of the base task's total that has this collaboration pattern (sums to 100% within each task)
+
+          # Occupation Metrics
+          - **soc_pct**: Percentage of classified O*NET tasks associated with this SOC major occupation group (e.g., Management, Computer and Mathematical)
+
+          **Request Metrics**:
+          - **request_count**: Number of conversations in this request category level
+          - **request_pct**: Percentage of geographic total in this category
+          - **request_pct_index**: Specialization index comparing request usage to baseline
+          - **request_collaboration_count**: Number of conversations with both this request category and collaboration pattern (intersection)
+          - **request_collaboration_pct**: Percentage of the base request's total that has this collaboration pattern (sums to 100% within each request)
+
+          **Collaboration Pattern Metrics**:
+          - **collaboration_count**: Number of conversations with this collaboration pattern
+          - **collaboration_pct**: Percentage of geographic total with this pattern
+          - **collaboration_pct_index**: Specialization index comparing pattern to baseline
+          - **automation_pct**: Percentage of classifiable collaboration that is automation-focused (directive, feedback loop patterns)
+          - **augmentation_pct**: Percentage of classifiable collaboration that is augmentation-focused (validation, task iteration, learning patterns)
+
+          # Demographic & Economic Metrics
+          - **working_age_pop**: Population aged 15-64 (working age definition used by World Bank)
+          - **gdp_per_working_age_capita**: Total GDP divided by working age population (in USD)
+
+      - name: cluster_name
+        data_type: string
+        description: Specific entity within facet (task, pattern, etc.). For intersections, format is "base::category"
+
+      - name: value
+        data_type: float64
+        description: Numeric metric value

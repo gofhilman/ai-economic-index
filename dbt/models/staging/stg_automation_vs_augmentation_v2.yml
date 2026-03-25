@@ -1,0 +1,11 @@
+models:
+  - name: stg_automation_vs_augmentation_v2
+    description: "Data on automation/augmentation patterns from the second Anthropic Economic Index report"
+    columns:
+      - name: interaction_type
+        data_type: string
+        description: "Type of interaction (directive, feedback loop, validation, task iteration, learning, none)"
+
+      - name: pct
+        data_type: float64
+        description: "Percentage of this interaction type in the dataset"
