@@ -31,6 +31,12 @@ tasks:
     key: GC_RAW_DATASET
     kvType: STRING
     value: raw_dataset
+
+  - id: gc_clustered_dataset
+    type: io.kestra.plugin.core.kv.Set
+    key: GC_CLUSTERED_DATASET
+    kvType: STRING
+    value: clustered_dataset
   
   - id: gc_external_dataset
     type: io.kestra.plugin.core.kv.Set

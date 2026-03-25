@@ -1,0 +1,26 @@
+id: bq_clustering
+namespace: ai_economic_index
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GC_SERVICE_ACCOUNT') }}"
+      projectId: "{{ kv('GC_PROJECT_ID') }}"
+      location: "{{ kv('GC_LOCATION') }}"
+
+tasks:
+  - id: create_dataset
+    type: io.kestra.plugin.gcp.bigquery.CreateDataset
+    name: "{{ kv('GC_CLUSTERED_DATASET') }}"
+    ifExists: SKIP
+
+  - id: create_clustered_table
+    type: io.kestra.plugin.gcp.bigquery.Query
+    sql: |
+      CREATE OR REPLACE TABLE `{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_CLUSTERED_DATASET') }}.aei_clustered_claude_ai_2025_11_13_to_2025_11_20`
+      CLUSTER BY geography, geo_id, facet, variable 
+      AS 
+      SELECT * 
+      FROM `{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_RAW_DATASET') }}.aei_raw_claude_ai_2025_11_13_to_2025_11_20`
+      
+      

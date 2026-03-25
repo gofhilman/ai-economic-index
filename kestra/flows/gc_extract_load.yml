@@ -1,4 +1,4 @@
-id: gc_el
+id: gc_extract_load
 namespace: ai_economic_index
 
 pluginDefaults:
