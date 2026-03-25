@@ -1,0 +1,31 @@
+models:
+  - name: stg_soc_structure
+    description: Hierarchical classification system for occupations, providing standardized occupation titles and codes.
+    columns:
+      - name: major_group
+        data_type: string
+        description: ""
+
+      - name: minor_group
+        data_type: string
+        description: ""
+
+      - name: broad_occupation
+        data_type: string
+        description: ""
+
+      - name: detailed_occupation
+        data_type: string
+        description: ""
+
+      - name: detailed_o_net_soc
+        data_type: string
+        description: ""
+
+      - name: soc_or_o_net_soc_2019_title
+        data_type: string
+        description: ""
+
+      - name: soc_major_group
+        data_type: int64
+        description: ""

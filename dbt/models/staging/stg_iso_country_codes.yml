@@ -1,0 +1,17 @@
+models:
+  - name: stg_iso_country_codes
+    description: >
+      International standard codes for representing countries and territories, 
+      used for mapping IP-based geolocation data to standardized country identifiers
+    columns:
+      - name: iso_alpha_2
+        data_type: string
+        description: ""
+
+      - name: iso_alpha_3
+        data_type: string
+        description: ""
+
+      - name: country_name
+        data_type: string
+        description: ""

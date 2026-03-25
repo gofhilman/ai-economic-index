@@ -1,0 +1,21 @@
+models:
+  - name: stg_census_state_codes
+    description: >
+      Official state and territory codes including FIPS codes and two-letter USPS abbreviations 
+      for all U.S. states, territories, and the District of Columbia
+    columns:
+      - name: state
+        data_type: int64
+        description: ""
+
+      - name: stusab
+        data_type: string
+        description: ""
+
+      - name: state_name
+        data_type: string
+        description: ""
+
+      - name: statens
+        data_type: int64
+        description: ""

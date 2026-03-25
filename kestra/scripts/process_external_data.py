@@ -23,6 +23,15 @@ FILE_CONFIG = {
     ".txt": "|",
 }
 
+# ── Explicit schema overrides (for files where autodetect fails) ──────────
+SCHEMA_OVERRIDES = {
+    "iso_country_codes": [
+        bigquery.SchemaField("iso_alpha_2", "STRING"),
+        bigquery.SchemaField("iso_alpha_3", "STRING"),
+        bigquery.SchemaField("country_name", "STRING"),
+    ]
+}
+
 # ── Discover files directly from mounted volume ───────────────────────────
 all_files = glob.glob("/external-data/**/*.*", recursive=True) + \
             glob.glob("/external-data/*.*")
@@ -48,15 +57,17 @@ for local_path in supported_files:
     blob.upload_from_filename(local_path)
     print(f"[✓] Uploaded  '{filename}'  →  {gcs_uri}")
 
-    # Load into BigQuery ──────────────────────────────────────────────────
+    # Build job config ────────────────────────────────────────────────────
+    explicit_schema = SCHEMA_OVERRIDES.get(table_name)
     job_config = bigquery.LoadJobConfig(
         source_format      = bigquery.SourceFormat.CSV,
         field_delimiter    = delimiter,
         skip_leading_rows  = 1,
-        autodetect         = True,
+        autodetect         = explicit_schema is None,
+        schema             = explicit_schema,
         write_disposition  = bigquery.WriteDisposition.WRITE_TRUNCATE,
         create_disposition = bigquery.CreateDisposition.CREATE_IF_NEEDED,
-        column_name_character_map = "V2"
+        column_name_character_map = "V1"
     )
 
     load_job = bq_client.load_table_from_uri(

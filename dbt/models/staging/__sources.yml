@@ -24,3 +24,34 @@ sources:
     tables:
       - name: aei_clustered_claude_ai_2025_11_13_to_2025_11_20
         description: aei_raw_claude_ai_2025_11_13_to_2025_11_20 table clustered by geography, geo_id, facet, variable
+  
+  - name: external_dataset
+    schema: external_dataset
+    description: External dataset to enrich Claude usage dataset with external economic and demographic sources
+    tables:
+      - name: census_state_codes
+        description: >
+          Official state and territory codes including FIPS codes and two-letter USPS abbreviations 
+          for all U.S. states, territories, and the District of Columbia
+      - name: gdp_2024_country
+        description: Total gross domestic product at current market prices for all countries and territories
+      - name: gdp_2024_us_state
+        description: Gross domestic product by state in millions of current U.S. dollars
+      - name: iso_country_codes
+        description: >
+          International standard codes for representing countries and territories, 
+          used for mapping IP-based geolocation data to standardized country identifiers
+      - name: onet_task_statements
+        description: >
+          Comprehensive database of task statements associated with occupations in the O*NET-SOC taxonomy, 
+          providing detailed work activities for each occupation
+      - name: soc_structure
+        description: Hierarchical classification system for occupations, providing standardized occupation titles and codes.
+      - name: working_age_pop_2024_country
+        description: >
+          Total population between the ages 15 to 64. Population is based on the de facto definition of population, 
+          which counts all residents regardless of legal status or citizenship.
+      - name: working_age_pop_2024_us_state
+        description: >
+          Annual estimates of the civilian population by single year of age, sex, race, and Hispanic origin for states 
+          and the District of Columbia.

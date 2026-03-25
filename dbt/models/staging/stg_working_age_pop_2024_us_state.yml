@@ -1,0 +1,17 @@
+models:
+  - name: stg_working_age_pop_2024_us_state
+    description: >
+      Annual estimates of the civilian population by single year of age, sex, race, and Hispanic origin for states 
+      and the District of Columbia.
+    columns:
+      - name: state
+        data_type: string
+        description: ""
+
+      - name: working_age_pop
+        data_type: int64
+        description: ""
+
+      - name: state_code
+        data_type: string
+        description: ""
