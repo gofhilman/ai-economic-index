@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: raw_dataset
+    schema: raw_dataset
+    description: Raw dataset for the AI Economic Index
+    tables:
+      - name: task_pct_v1
+        description: Data on task usage patterns from the first Anthropic Economic Index report
+      - name: task_pct_v2
+        description: Data on task usage patterns from the second Anthropic Economic Index report
+      - name: automation_vs_augmentation_v1
+        description: Data on automation/augmentation patterns from the first Anthropic Economic Index report
+      - name: automation_vs_augmentation_v2
+        description: Data on automation/augmentation patterns from the second Anthropic Economic Index report
+      - name: aei_raw_claude_ai_2025_08_04_to_2025_08_11
+        description: Claude.ai usage metrics aggregated by geography and analysis dimensions (facets) taken from 2025-08-04 to 2025-08-11
+      - name: aei_raw_claude_ai_2025_11_13_to_2025_11_20
+        description: Claude.ai usage metrics aggregated by geography and analysis dimensions (facets) taken from 2025-11-13 to 2025-11-20
+
+  - name: clustered_dataset
+    schema: clustered_dataset
+    description: Clustered dataset for aei_clustered_claude_ai_2025_11_13_to_2025_11_20 table
+    tables:
+      - name: aei_clustered_claude_ai_2025_11_13_to_2025_11_20
+        description: aei_raw_claude_ai_2025_11_13_to_2025_11_20 table clustered by geography, geo_id, facet, variable
