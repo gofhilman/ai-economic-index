@@ -1,6 +1,6 @@
 models:
-  - name: stg_aei_clustered_claude_ai_2025_11_13_to_2025_11_20
-    description: "aei_raw_claude_ai_2025_11_13_to_2025_11_20 table clustered by geography, geo_id, facet, variable"
+  - name: stg_aei_clustered_claude_ai_2026_02_05_to_2026_02_12
+    description: "aei_raw_claude_ai_2026_02_05_to_2026_02_12 table clustered by geography, geo_id, facet, variable"
     columns:
       - name: geo_id
         data_type: string

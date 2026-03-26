@@ -17,10 +17,10 @@ tasks:
   - id: create_clustered_table
     type: io.kestra.plugin.gcp.bigquery.Query
     sql: |
-      CREATE OR REPLACE TABLE `{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_CLUSTERED_DATASET') }}.aei_clustered_claude_ai_2025_11_13_to_2025_11_20`
+      CREATE OR REPLACE TABLE `{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_CLUSTERED_DATASET') }}.aei_clustered_claude_ai_2026_02_05_to_2026_02_12`
       CLUSTER BY geography, geo_id, facet, variable 
       AS 
       SELECT * 
-      FROM `{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_RAW_DATASET') }}.aei_raw_claude_ai_2025_11_13_to_2025_11_20`
+      FROM `{{ kv('GC_PROJECT_ID') }}.{{ kv('GC_RAW_DATASET') }}.aei_raw_claude_ai_2026_02_05_to_2026_02_12`
       
       

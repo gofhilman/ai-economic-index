@@ -17,13 +17,15 @@ sources:
         description: Claude.ai usage metrics aggregated by geography and analysis dimensions (facets) taken from 2025-08-04 to 2025-08-11
       - name: aei_raw_claude_ai_2025_11_13_to_2025_11_20
         description: Claude.ai usage metrics aggregated by geography and analysis dimensions (facets) taken from 2025-11-13 to 2025-11-20
+      - name: aei_raw_claude_ai_2026_02_05_to_2026_02_12
+        description: Claude.ai usage metrics aggregated by geography and analysis dimensions (facets) taken from 2026-02-05 to 2026-02-12
 
   - name: clustered_dataset
     schema: clustered_dataset
-    description: Clustered dataset for aei_clustered_claude_ai_2025_11_13_to_2025_11_20 table
+    description: Clustered dataset for aei_clustered_claude_ai_2026_02_05_to_2026_02_12 table
     tables:
-      - name: aei_clustered_claude_ai_2025_11_13_to_2025_11_20
-        description: aei_raw_claude_ai_2025_11_13_to_2025_11_20 table clustered by geography, geo_id, facet, variable
+      - name: aei_clustered_claude_ai_2026_02_05_to_2026_02_12
+        description: aei_raw_claude_ai_2026_02_05_to_2026_02_12 table clustered by geography, geo_id, facet, variable
   
   - name: external_dataset
     schema: external_dataset
