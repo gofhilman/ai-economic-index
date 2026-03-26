@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: mart_aei_enriched_claude_ai_2025_11_13_to_2025_11_20
+    description: >
+      Enriched long-format Claude.ai AEI mart for the 2025-11-13 to 2025-11-20
+      clustered dataset, including geography normalization, geo names, zero-fill
+      scaffolding, external demographic/economic metrics, and notebook-parity derived metrics.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - geo_id
+              - geography
+              - date_start
+              - date_end
+              - platform_and_product
+              - facet
+              - level
+              - variable
+              - cluster_name
+    columns:
+      - name: geo_id
+        data_type: string
+        description: Enriched geography identifier using ISO-3 for countries and USA-prefixed ISO 3166-2 style codes for US states.
+        data_tests:
+          - not_null
+      - name: geo_name
+        data_type: string
+        description: Human-readable geography name for the row.
+        data_tests:
+          - not_null
+      - name: geography
+        data_type: string
+        description: Geographic level in the enriched output.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['global', 'country', 'country-state']
+      - name: date_start
+        data_type: date
+        description: Start date of the source collection window.
+        data_tests:
+          - not_null
+      - name: date_end
+        data_type: date
+        description: End date of the source collection window.
+        data_tests:
+          - not_null
+      - name: platform_and_product
+        data_type: string
+        description: Product label carried through from the clustered source.
+        data_tests:
+          - not_null
+      - name: facet
+        data_type: string
+        description: Analysis facet for the metric row.
+        data_tests:
+          - not_null
+      - name: level
+        data_type: int64
+        description: Hierarchy level associated with the facet.
+        data_tests:
+          - not_null
+      - name: variable
+        data_type: string
+        description: Metric name, including both source metrics and enrichment-derived metrics.
+        data_tests:
+          - not_null
+      - name: cluster_name
+        data_type: string
+        description: Category name for the row, or an empty string for geography-level metrics.
+        data_tests:
+          - not_null
+      - name: value
+        data_type: float64
+        description: Numeric value for the metric row.
+        data_tests:
+          - not_null
