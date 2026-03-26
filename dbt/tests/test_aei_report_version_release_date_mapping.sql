@@ -21,6 +21,11 @@ with expected as (
         date '2026-01-15' as report_release_date
     union all
     select
+        'int_aei_task_shares_by_version' as model_name,
+        'v5' as report_version,
+        date '2026-03-24' as report_release_date
+    union all
+    select
         'int_aei_collaboration_shares_by_version' as model_name,
         'v1' as report_version,
         date '2025-02-10' as report_release_date
@@ -39,6 +44,11 @@ with expected as (
         'int_aei_collaboration_shares_by_version' as model_name,
         'v4' as report_version,
         date '2026-01-15' as report_release_date
+    union all
+    select
+        'int_aei_collaboration_shares_by_version' as model_name,
+        'v5' as report_version,
+        date '2026-03-24' as report_release_date
 
 ),
 

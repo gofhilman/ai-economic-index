@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: int_aei_enriched_v5_scaffold_rows
+    description: >
+      Normalized and enriched V5 Claude.ai AEI base rows, including geography
+      standardization, geo names, zero-filled usage rows, and external working-age
+      population and GDP-derived metrics for supported countries and US states.
+
+  - name: int_aei_enriched_v5_usage_metrics
+    description: >
+      Derived V5 usage metrics computed from the enriched scaffold, including
+      usage per capita, usage per capita index, and notebook-parity usage tiers.
+
+  - name: int_aei_enriched_v5_pct_index_metrics
+    description: >
+      Derived V5 percentage index metrics for onet task, collaboration, and
+      request facets, benchmarked against global or US country baselines.
+
+  - name: int_aei_enriched_v5_soc_metrics
+    description: >
+      Derived V5 SOC distribution metrics computed from onet task shares using
+      the shared task-to-SOC mapping table.
+
+  - name: int_aei_enriched_v5_automation_metrics
+    description: >
+      Derived V5 automation and augmentation percentage metrics computed from
+      collaboration counts for eligible geographies.

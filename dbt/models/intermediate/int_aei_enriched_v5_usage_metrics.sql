@@ -1,11 +1,11 @@
 with scaffold_rows as (
 
     select *
-    from {{ ref('int_aei_enriched_v4_scaffold_rows') }}
+    from {{ ref('int_aei_enriched_v5_scaffold_rows') }}
 
 ),
 
-{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
+{{ aei_enriched_filtered_geography_ctes('scaffold_rows') }},
 
 population_rows as (
 
@@ -193,7 +193,7 @@ filtered_usage_index_rows as (
 
     select *
     from usage_per_capita_index_rows
-    where {{ aei_v4_threshold_eligible_geography_condition() }}
+    where {{ aei_enriched_threshold_eligible_geography_condition() }}
 
 ),
 

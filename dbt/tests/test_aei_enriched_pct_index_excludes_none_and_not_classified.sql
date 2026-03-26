@@ -3,7 +3,7 @@ select
     geography,
     variable,
     cluster_name
-from {{ ref('mart_aei_enriched_claude_ai_2025_11_13_to_2025_11_20') }}
+from {{ ref('mart_aei_enriched_claude_ai_2026_02_05_to_2026_02_12') }}
 where regexp_contains(variable, r'_pct_index$')
   and (
         cluster_name in ('none', 'not_classified')

@@ -2,7 +2,7 @@ with supported_tasks as (
 
     select distinct
         lower(trim(cluster_name)) as task_name
-    from {{ ref('mart_aei_enriched_claude_ai_2025_11_13_to_2025_11_20') }}
+    from {{ ref('mart_aei_enriched_claude_ai_2026_02_05_to_2026_02_12') }}
     where facet = 'onet_task'
       and variable = 'onet_task_pct'
       and cluster_name != 'none'

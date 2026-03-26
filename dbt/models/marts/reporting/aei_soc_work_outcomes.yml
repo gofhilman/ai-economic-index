@@ -3,7 +3,7 @@ version: 2
 models:
   - name: mart_aei_work_soc_outcomes
     description: >
-      SOC-group reporting mart for the November 13-20, 2025 Claude.ai AEI slice,
+      SOC-group reporting mart for the February 5-12, 2026 Claude.ai AEI slice,
       filtered to global work use cases. Because the source mart exposes `work` as
       a task intersection while the requested outcome metrics are task-level, the
       model approximates the work-only view by reweighting each task's metrics by

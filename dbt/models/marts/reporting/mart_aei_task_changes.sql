@@ -16,7 +16,8 @@ with_context as (
         task_shares.v1_pct,
         task_shares.v2_pct,
         task_shares.v3_pct,
-        task_shares.v4_pct
+        task_shares.v4_pct,
+        task_shares.v5_pct
     from task_shares
     left join {{ ref('int_aei_task_to_soc_group') }} as task_to_soc_group
         on task_shares.task_name = task_to_soc_group.task_name
@@ -32,15 +33,16 @@ calculated as (
         v2_pct,
         v3_pct,
         v4_pct,
-        v4_pct - v1_pct as latest_vs_v1_diff_pp,
+        v5_pct,
+        v5_pct - v1_pct as latest_vs_v1_diff_pp,
         case
             when v1_pct > 0
-                then safe_divide((v4_pct - v1_pct) * 100, v1_pct)
+                then safe_divide((v5_pct - v1_pct) * 100, v1_pct)
         end as latest_vs_v1_rel_change_pct,
         v1_pct = 0 as is_new_since_v1,
         case
             when v1_pct = 0 then 'new'
-            else format('%+.0f%%', safe_divide((v4_pct - v1_pct) * 100, v1_pct))
+            else format('%+.0f%%', safe_divide((v5_pct - v1_pct) * 100, v1_pct))
         end as change_label
     from with_context
 
@@ -53,6 +55,7 @@ select
     v2_pct,
     v3_pct,
     v4_pct,
+    v5_pct,
     latest_vs_v1_diff_pp,
     latest_vs_v1_rel_change_pct,
     is_new_since_v1,

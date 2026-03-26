@@ -50,6 +50,21 @@ collaboration_v4 as (
 
 ),
 
+collaboration_v5 as (
+
+    select
+        'v5' as report_version,
+        {{ aei_report_release_date_literal('v5') }} as report_release_date,
+        {{ aei_normalize_identifier('cluster_name') }} as interaction_type,
+        cast(value as float64) as pct
+    from {{ ref('stg_aei_raw_claude_ai_2026_02_05_to_2026_02_12') }}
+    where geo_id = 'GLOBAL'
+      and facet = 'collaboration'
+      and level = 0
+      and variable = 'collaboration_pct'
+
+),
+
 unioned as (
 
     select * from collaboration_v1
@@ -59,6 +74,8 @@ unioned as (
     select * from collaboration_v3
     union all
     select * from collaboration_v4
+    union all
+    select * from collaboration_v5
 
 ),
 
@@ -96,4 +113,4 @@ select
         else safe_divide(pct * 100, pct_excluding_not_classified)
     end as pct
 from with_totals
-where not (report_version in ('v3', 'v4') and interaction_type = 'not_classified')
+where not (report_version in ('v3', 'v4', 'v5') and interaction_type = 'not_classified')

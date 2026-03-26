@@ -1,11 +1,11 @@
 with scaffold_rows as (
 
     select *
-    from {{ ref('int_aei_enriched_v4_scaffold_rows') }}
+    from {{ ref('int_aei_enriched_v5_scaffold_rows') }}
 
 ),
 
-{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
+{{ aei_enriched_filtered_geography_ctes('scaffold_rows') }},
 
 pct_source_rows as (
 
@@ -23,7 +23,7 @@ pct_source_rows as (
         value
     from scaffold_rows
     where variable in ('onet_task_pct', 'collaboration_pct', 'request_pct')
-      and {{ aei_v4_is_classified_cluster('cluster_name') }}
+      and {{ aei_enriched_is_classified_cluster('cluster_name') }}
 
 ),
 

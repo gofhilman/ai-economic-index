@@ -1,11 +1,11 @@
 with scaffold_rows as (
 
     select *
-    from {{ ref('int_aei_enriched_v4_scaffold_rows') }}
+    from {{ ref('int_aei_enriched_v5_scaffold_rows') }}
 
 ),
 
-{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
+{{ aei_enriched_filtered_geography_ctes('scaffold_rows') }},
 
 soc_input_rows as (
 
@@ -21,7 +21,7 @@ soc_input_rows as (
     from scaffold_rows
     where facet = 'onet_task'
       and variable = 'onet_task_pct'
-      and {{ aei_v4_threshold_eligible_geography_condition(include_global=true) }}
+      and {{ aei_enriched_threshold_eligible_geography_condition(include_global=true) }}
 
 ),
 
@@ -39,7 +39,7 @@ soc_mapped_rows as (
     from soc_input_rows
     inner join {{ ref('int_aei_task_to_soc_group') }} as int_aei_task_to_soc_group
         on lower(trim(soc_input_rows.cluster_name)) = int_aei_task_to_soc_group.task_name
-    where {{ aei_v4_is_classified_cluster('soc_input_rows.cluster_name') }}
+    where {{ aei_enriched_is_classified_cluster('soc_input_rows.cluster_name') }}
 
 ),
 

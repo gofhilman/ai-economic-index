@@ -130,7 +130,7 @@ source_rows as (
         variable,
         coalesce(cluster_name, '') as cluster_name,
         cast(value as float64) as value
-    from {{ ref('stg_aei_clustered_claude_ai_2025_11_13_to_2025_11_20') }}
+    from {{ ref('stg_aei_clustered_claude_ai_2026_02_05_to_2026_02_12') }}
     where geography in ('global', 'country')
        or (
             geography = 'country-state'

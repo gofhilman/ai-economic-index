@@ -1,11 +1,11 @@
 with scaffold_rows as (
 
     select *
-    from {{ ref('int_aei_enriched_v4_scaffold_rows') }}
+    from {{ ref('int_aei_enriched_v5_scaffold_rows') }}
 
 ),
 
-{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
+{{ aei_enriched_filtered_geography_ctes('scaffold_rows') }},
 
 collaboration_count_rows as (
 
@@ -41,7 +41,7 @@ eligible_collaboration_rows as (
     select *
     from collaboration_count_rows
     where category is not null
-      and {{ aei_v4_threshold_eligible_geography_condition(include_global=true) }}
+      and {{ aei_enriched_threshold_eligible_geography_condition(include_global=true) }}
 
 ),
 

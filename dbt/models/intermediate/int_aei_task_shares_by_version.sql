@@ -48,6 +48,20 @@ task_pct_v4 as (
 
 ),
 
+task_pct_v5 as (
+
+    select
+        'v5' as report_version,
+        {{ aei_report_release_date_literal('v5') }} as report_release_date,
+        {{ aei_normalize_text('cluster_name') }} as task_name,
+        cast(value as float64) as pct
+    from {{ ref('stg_aei_raw_claude_ai_2026_02_05_to_2026_02_12') }}
+    where geo_id = 'GLOBAL'
+      and facet = 'onet_task'
+      and variable = 'onet_task_pct'
+
+),
+
 unioned as (
 
     select * from task_pct_v1
@@ -57,6 +71,8 @@ unioned as (
     select * from task_pct_v3
     union all
     select * from task_pct_v4
+    union all
+    select * from task_pct_v5
 
 ),
 
@@ -88,9 +104,9 @@ select
     report_release_date,
     task_name,
     case
-        when report_version in ('v3', 'v4')
+        when report_version in ('v3', 'v4', 'v5')
             then safe_divide(pct * 100, pct_excluding_not_classified)
         else pct
     end as pct
 from with_totals
-where not (report_version in ('v3', 'v4') and task_name = 'not_classified')
+where not (report_version in ('v3', 'v4', 'v5') and task_name = 'not_classified')

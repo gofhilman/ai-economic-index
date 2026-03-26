@@ -7,6 +7,8 @@ with versions as (
     select 'v3' as report_version
     union all
     select 'v4' as report_version
+    union all
+    select 'v5' as report_version
 
 ),
 

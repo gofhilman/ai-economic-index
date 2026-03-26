@@ -4,7 +4,7 @@ models:
   - name: int_aei_task_shares_by_version
     description: >
       Canonical task-share series across AEI report releases, with task names normalized
-      and v3/v4 renormalized after excluding the not_classified bucket.
+      and v3-v5 renormalized after excluding the not_classified bucket.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -14,12 +14,12 @@ models:
     columns:
       - name: report_version
         data_type: string
-        description: AEI report version label from v1 through v4.
+        description: AEI report version label from v1 through v5.
         data_tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['v1', 'v2', 'v3', 'v4']
+                values: ['v1', 'v2', 'v3', 'v4', 'v5']
       - name: report_release_date
         data_type: date
         description: Public release date for the report represented by the row.
@@ -49,12 +49,12 @@ models:
     columns:
       - name: report_version
         data_type: string
-        description: AEI report version label from v1 through v4.
+        description: AEI report version label from v1 through v5.
         data_tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['v1', 'v2', 'v3', 'v4']
+                values: ['v1', 'v2', 'v3', 'v4', 'v5']
       - name: report_release_date
         data_type: date
         description: Public release date for the report represented by the row.

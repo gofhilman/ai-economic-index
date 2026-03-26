@@ -27,6 +27,7 @@ select
     v2_pct,
     v3_pct,
     v4_pct,
-    v4_pct - v1_pct as latest_vs_v1_diff_pp
+    v5_pct,
+    v5_pct - v1_pct as latest_vs_v1_diff_pp
 from pivoted
-where greatest(v1_pct, v2_pct, v3_pct, v4_pct) >= 1.0
+where greatest(v1_pct, v2_pct, v3_pct, v4_pct, v5_pct) >= 1.0

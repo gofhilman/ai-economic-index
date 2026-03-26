@@ -1,27 +1,27 @@
 with all_rows as (
 
     select *
-    from {{ ref('int_aei_enriched_v4_scaffold_rows') }}
+    from {{ ref('int_aei_enriched_v5_scaffold_rows') }}
 
     union all
 
     select *
-    from {{ ref('int_aei_enriched_v4_usage_metrics') }}
+    from {{ ref('int_aei_enriched_v5_usage_metrics') }}
 
     union all
 
     select *
-    from {{ ref('int_aei_enriched_v4_pct_index_metrics') }}
+    from {{ ref('int_aei_enriched_v5_pct_index_metrics') }}
 
     union all
 
     select *
-    from {{ ref('int_aei_enriched_v4_soc_metrics') }}
+    from {{ ref('int_aei_enriched_v5_soc_metrics') }}
 
     union all
 
     select *
-    from {{ ref('int_aei_enriched_v4_automation_metrics') }}
+    from {{ ref('int_aei_enriched_v5_automation_metrics') }}
 
 )
 

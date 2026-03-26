@@ -1,5 +1,5 @@
 {% macro aei_report_versions() -%}
-    {{ return(['v1', 'v2', 'v3', 'v4']) }}
+    {{ return(['v1', 'v2', 'v3', 'v4', 'v5']) }}
 {%- endmacro %}
 
 {% macro aei_report_release_date_literal(report_version) -%}
@@ -11,6 +11,8 @@
         date '2025-09-15'
     {%- elif report_version == 'v4' -%}
         date '2026-01-15'
+    {%- elif report_version == 'v5' -%}
+        date '2026-03-24'
     {%- else -%}
         {{ exceptions.raise_compiler_error('Unsupported AEI report version: ' ~ report_version) }}
     {%- endif -%}

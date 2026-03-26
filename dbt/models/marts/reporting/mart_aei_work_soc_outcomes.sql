@@ -11,7 +11,7 @@ with base as (
         variable,
         cluster_name,
         value
-    from {{ ref('mart_aei_enriched_claude_ai_2025_11_13_to_2025_11_20') }}
+    from {{ ref('mart_aei_enriched_claude_ai_2026_02_05_to_2026_02_12') }}
     where geo_id = 'GLOBAL'
 
 ),
@@ -144,7 +144,7 @@ task_ai_autonomy_metrics as (
         date_start,
         date_end,
         platform_and_product,
-        {{ aei_normalize_text('cluster_name') }} as task_name,
+        {{ aei_normalize_text("split(cluster_name, '::')[safe_offset(0)]") }} as task_name,
         max(case when variable = 'onet_task_ai_autonomy_count' then value end) as ai_autonomy_count,
         max(case when variable = 'onet_task_ai_autonomy_mean' then value end) as ai_autonomy_mean,
         max(case when variable = 'onet_task_ai_autonomy_mean_ci_lower' then value end) as ai_autonomy_mean_ci_lower,
@@ -170,7 +170,7 @@ task_human_only_time_metrics as (
         date_start,
         date_end,
         platform_and_product,
-        {{ aei_normalize_text('cluster_name') }} as task_name,
+        {{ aei_normalize_text("split(cluster_name, '::')[safe_offset(0)]") }} as task_name,
         max(case when variable = 'onet_task_human_only_time_count' then value end) as human_only_time_count,
         max(case when variable = 'onet_task_human_only_time_mean' then value end) as human_only_time_mean,
         max(case when variable = 'onet_task_human_only_time_mean_ci_lower' then value end) as human_only_time_mean_ci_lower,
@@ -196,7 +196,7 @@ task_human_with_ai_time_metrics as (
         date_start,
         date_end,
         platform_and_product,
-        {{ aei_normalize_text('cluster_name') }} as task_name,
+        {{ aei_normalize_text("split(cluster_name, '::')[safe_offset(0)]") }} as task_name,
         max(case when variable = 'onet_task_human_with_ai_time_count' then value end) as human_with_ai_time_count,
         max(case when variable = 'onet_task_human_with_ai_time_mean' then value end) as human_with_ai_time_mean,
         max(case when variable = 'onet_task_human_with_ai_time_mean_ci_lower' then value end) as human_with_ai_time_mean_ci_lower,
