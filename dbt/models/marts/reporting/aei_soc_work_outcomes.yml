@@ -1,0 +1,162 @@
+version: 2
+
+models:
+  - name: mart_aei_work_soc_outcomes
+    description: >
+      SOC-group reporting mart for the November 13-20, 2025 Claude.ai AEI slice,
+      filtered to global work use cases. Because the source mart exposes `work` as
+      a task intersection while the requested outcome metrics are task-level, the
+      model approximates the work-only view by reweighting each task's metrics by
+      its observed work-use-case share before rolling them up to SOC groups.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - geo_id
+              - date_start
+              - date_end
+              - platform_and_product
+              - use_case
+              - soc_group
+    columns:
+      - name: geo_id
+        data_type: string
+        description: Geographic identifier fixed to `GLOBAL` for this reporting slice.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['GLOBAL']
+      - name: geo_name
+        data_type: string
+        description: Human-readable geography label for the global slice.
+        data_tests:
+          - not_null
+      - name: geography
+        data_type: string
+        description: Geography grain from the source mart, expected to be `global`.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['global']
+      - name: date_start
+        data_type: date
+        description: Start date of the AEI reporting window.
+        data_tests:
+          - not_null
+      - name: date_end
+        data_type: date
+        description: End date of the AEI reporting window.
+        data_tests:
+          - not_null
+      - name: platform_and_product
+        data_type: string
+        description: Source platform/product label carried through from the enriched mart.
+        data_tests:
+          - not_null
+      - name: use_case
+        data_type: string
+        description: Use-case filter applied to the reporting mart, fixed to `work`.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['work']
+      - name: soc_group
+        data_type: string
+        description: SOC major-group title, normalized to match existing reporting marts.
+        data_tests:
+          - not_null
+      - name: mapped_task_count
+        data_type: int64
+        description: Count of distinct mapped O*NET tasks with non-zero work usage in the SOC group.
+        data_tests:
+          - not_null
+      - name: work_use_case_count
+        data_type: float64
+        description: Sum of work-use-case conversation counts across mapped tasks in the SOC group.
+        data_tests:
+          - not_null
+      - name: work_use_case_pct
+        data_type: float64
+        description: SOC share of mapped global work-use-case conversations.
+        data_tests:
+          - not_null
+      - name: task_success_observation_count
+        data_type: float64
+        description: Estimated number of work observations contributing to task success.
+        data_tests:
+          - not_null
+      - name: successful_task_count
+        data_type: float64
+        description: Estimated number of successful work observations in the SOC group.
+        data_tests:
+          - not_null
+      - name: task_success_rate
+        data_type: float64
+        description: Estimated work-filtered task success share for the SOC group.
+      - name: ai_autonomy_observation_count
+        data_type: float64
+        description: Estimated number of work observations contributing to the AI autonomy metric.
+        data_tests:
+          - not_null
+      - name: ai_autonomy_score
+        data_type: float64
+        description: Work-weighted AI autonomy mean for the SOC group.
+      - name: ai_autonomy_score_ci_lower
+        data_type: float64
+        description: Work-weighted lower 95% confidence bound for AI autonomy.
+      - name: ai_autonomy_score_ci_upper
+        data_type: float64
+        description: Work-weighted upper 95% confidence bound for AI autonomy.
+      - name: human_only_time_observation_count
+        data_type: float64
+        description: Estimated number of work observations contributing to the human-only time metric.
+        data_tests:
+          - not_null
+      - name: human_only_time_mean
+        data_type: float64
+        description: Work-weighted mean time for a human to complete the task without AI.
+      - name: human_only_time_mean_ci_lower
+        data_type: float64
+        description: Work-weighted lower 95% confidence bound for human-only time.
+      - name: human_only_time_mean_ci_upper
+        data_type: float64
+        description: Work-weighted upper 95% confidence bound for human-only time.
+      - name: human_with_ai_time_observation_count
+        data_type: float64
+        description: Estimated number of work observations contributing to the human-with-AI time metric.
+        data_tests:
+          - not_null
+      - name: human_with_ai_time_mean
+        data_type: float64
+        description: Work-weighted mean time for a human to complete the task with AI assistance.
+      - name: human_with_ai_time_mean_ci_lower
+        data_type: float64
+        description: Work-weighted lower 95% confidence bound for human-with-AI time.
+      - name: human_with_ai_time_mean_ci_upper
+        data_type: float64
+        description: Work-weighted upper 95% confidence bound for human-with-AI time.
+      - name: time_savings_ratio
+        data_type: float64
+        description: Ratio defined as `1 - (human_with_ai_time_mean / human_only_time_mean)`.
+      - name: time_savings_ratio_ci_lower
+        data_type: float64
+        description: Conservative lower confidence bound for time savings derived from the time mean CIs.
+      - name: time_savings_ratio_ci_upper
+        data_type: float64
+        description: Conservative upper confidence bound for time savings derived from the time mean CIs.
+      - name: human_only_ability_observation_count
+        data_type: float64
+        description: Estimated number of work observations contributing to human-only ability.
+        data_tests:
+          - not_null
+      - name: requires_ai_task_count
+        data_type: float64
+        description: Estimated number of work observations that could not be done without AI.
+        data_tests:
+          - not_null
+      - name: human_only_ability_requires_ai_rate
+        data_type: float64
+        description: Estimated share of work observations that could not be completed without AI.
