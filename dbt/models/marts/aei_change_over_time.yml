@@ -1,0 +1,159 @@
+version: 2
+
+models:
+  - name: mart_aei_occupational_trends
+    description: >
+      Occupational-category usage-share trends across AEI report releases, aggregated from
+      normalized task shares and O*NET-to-SOC mappings.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - soc_group
+    columns:
+      - name: soc_group
+        data_type: string
+        description: SOC major-group title.
+        data_tests:
+          - not_null
+      - name: v1_pct
+        data_type: float64
+        description: Occupational share for the 2025-02-10 report.
+        data_tests:
+          - not_null
+      - name: v2_pct
+        data_type: float64
+        description: Occupational share for the 2025-03-27 report.
+        data_tests:
+          - not_null
+      - name: v3_pct
+        data_type: float64
+        description: Occupational share for the 2025-09-15 report.
+        data_tests:
+          - not_null
+      - name: v4_pct
+        data_type: float64
+        description: Occupational share for the 2026-01-15 report.
+        data_tests:
+          - not_null
+      - name: latest_vs_v1_diff_pp
+        data_type: float64
+        description: Percentage-point change between v4 and v1 occupational share.
+        data_tests:
+          - not_null
+
+  - name: mart_aei_task_changes
+    description: >
+      Task-level change table comparing the latest AEI report against the first release,
+      with SOC context added from the O*NET mapping data.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - task_name
+              - soc_group
+    columns:
+      - name: task_name
+        data_type: string
+        description: Normalized O*NET task label.
+        data_tests:
+          - not_null
+      - name: soc_group
+        data_type: string
+        description: SOC major-group title for the task when available.
+      - name: v1_pct
+        data_type: float64
+        description: Task share in the 2025-02-10 report.
+        data_tests:
+          - not_null
+      - name: v2_pct
+        data_type: float64
+        description: Task share in the 2025-03-27 report.
+        data_tests:
+          - not_null
+      - name: v3_pct
+        data_type: float64
+        description: Task share in the 2025-09-15 report.
+        data_tests:
+          - not_null
+      - name: v4_pct
+        data_type: float64
+        description: Task share in the 2026-01-15 report.
+        data_tests:
+          - not_null
+      - name: latest_vs_v1_diff_pp
+        data_type: float64
+        description: Percentage-point change between v4 and v1 task share.
+        data_tests:
+          - not_null
+      - name: latest_vs_v1_rel_change_pct
+        data_type: float64
+        description: Relative percentage change from v1 to v4 when a v1 baseline exists.
+      - name: is_new_since_v1
+        data_type: bool
+        description: Whether the task had zero share in v1.
+        data_tests:
+          - not_null
+      - name: change_label
+        data_type: string
+        description: Presentation-oriented label for the v4 versus v1 change.
+        data_tests:
+          - not_null
+
+  - name: mart_aei_automation_trends
+    description: >
+      Automation-versus-augmentation trend table with one row per AEI report release.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - report_version
+    columns:
+      - name: report_version
+        data_type: string
+        description: AEI report version label from v1 through v4.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['v1', 'v2', 'v3', 'v4']
+      - name: report_release_date
+        data_type: date
+        description: Public release date for the AEI report.
+        data_tests:
+          - not_null
+      - name: automation_total_pct
+        data_type: float64
+        description: Sum of directive and feedback_loop shares.
+        data_tests:
+          - not_null
+      - name: augmentation_total_pct
+        data_type: float64
+        description: Sum of validation, task_iteration, and learning shares.
+        data_tests:
+          - not_null
+      - name: directive_pct
+        data_type: float64
+        description: Directive collaboration share.
+        data_tests:
+          - not_null
+      - name: feedback_loop_pct
+        data_type: float64
+        description: Feedback-loop collaboration share.
+        data_tests:
+          - not_null
+      - name: validation_pct
+        data_type: float64
+        description: Validation collaboration share.
+        data_tests:
+          - not_null
+      - name: task_iteration_pct
+        data_type: float64
+        description: Task-iteration collaboration share.
+        data_tests:
+          - not_null
+      - name: learning_pct
+        data_type: float64
+        description: Learning collaboration share.
+        data_tests:
+          - not_null
