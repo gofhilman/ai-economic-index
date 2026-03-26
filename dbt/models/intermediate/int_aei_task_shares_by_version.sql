@@ -2,8 +2,8 @@ with task_pct_v1 as (
 
     select
         'v1' as report_version,
-        date '2025-02-10' as report_release_date,
-        lower(trim(task_name)) as task_name,
+        {{ aei_report_release_date_literal('v1') }} as report_release_date,
+        {{ aei_normalize_text('task_name') }} as task_name,
         cast(pct as float64) as pct
     from {{ ref('stg_task_pct_v1') }}
 
@@ -13,8 +13,8 @@ task_pct_v2 as (
 
     select
         'v2' as report_version,
-        date '2025-03-27' as report_release_date,
-        lower(trim(task_name)) as task_name,
+        {{ aei_report_release_date_literal('v2') }} as report_release_date,
+        {{ aei_normalize_text('task_name') }} as task_name,
         cast(pct as float64) as pct
     from {{ ref('stg_task_pct_v2') }}
 
@@ -24,8 +24,8 @@ task_pct_v3 as (
 
     select
         'v3' as report_version,
-        date '2025-09-15' as report_release_date,
-        lower(trim(cluster_name)) as task_name,
+        {{ aei_report_release_date_literal('v3') }} as report_release_date,
+        {{ aei_normalize_text('cluster_name') }} as task_name,
         cast(value as float64) as pct
     from {{ ref('stg_aei_raw_claude_ai_2025_08_04_to_2025_08_11') }}
     where geo_id = 'GLOBAL'
@@ -38,8 +38,8 @@ task_pct_v4 as (
 
     select
         'v4' as report_version,
-        date '2026-01-15' as report_release_date,
-        lower(trim(cluster_name)) as task_name,
+        {{ aei_report_release_date_literal('v4') }} as report_release_date,
+        {{ aei_normalize_text('cluster_name') }} as task_name,
         cast(value as float64) as pct
     from {{ ref('stg_aei_raw_claude_ai_2025_11_13_to_2025_11_20') }}
     where geo_id = 'GLOBAL'

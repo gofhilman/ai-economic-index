@@ -2,10 +2,7 @@ with task_shares as (
 
     select
         task_name,
-        sum(case when report_version = 'v1' then pct else 0 end) as v1_pct,
-        sum(case when report_version = 'v2' then pct else 0 end) as v2_pct,
-        sum(case when report_version = 'v3' then pct else 0 end) as v3_pct,
-        sum(case when report_version = 'v4' then pct else 0 end) as v4_pct
+        {{ aei_version_pct_columns('report_version', 'pct') }}
     from {{ ref('int_aei_task_shares_by_version') }}
     group by 1
 

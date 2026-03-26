@@ -5,27 +5,7 @@ with scaffold_rows as (
 
 ),
 
-filtered_countries as (
-
-    select distinct geo_id
-    from scaffold_rows
-    where geography = 'country'
-      and facet = 'country'
-      and variable = 'usage_count'
-      and value >= 200
-
-),
-
-filtered_us_states as (
-
-    select distinct geo_id
-    from scaffold_rows
-    where geography = 'country-state'
-      and facet = 'country-state'
-      and variable = 'usage_count'
-      and value >= 100
-
-),
+{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
 
 pct_source_rows as (
 
@@ -43,8 +23,7 @@ pct_source_rows as (
         value
     from scaffold_rows
     where variable in ('onet_task_pct', 'collaboration_pct', 'request_pct')
-      and cluster_name not in ('none', 'not_classified')
-      and not regexp_contains(lower(cluster_name), r'not_classified')
+      and {{ aei_v4_is_classified_cluster('cluster_name') }}
 
 ),
 

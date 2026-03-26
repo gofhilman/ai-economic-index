@@ -1,7 +1,7 @@
 with onet_tasks as (
 
     select
-        lower(trim(task)) as task_name,
+        {{ aei_normalize_text('task') }} as task_name,
         cast(soc_major_group as string) as soc_major_group
     from {{ ref('stg_onet_task_statements') }}
     where task is not null

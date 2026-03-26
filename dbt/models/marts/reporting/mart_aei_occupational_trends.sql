@@ -15,10 +15,7 @@ pivoted as (
 
     select
         soc_group,
-        sum(case when report_version = 'v1' then pct else 0 end) as v1_pct,
-        sum(case when report_version = 'v2' then pct else 0 end) as v2_pct,
-        sum(case when report_version = 'v3' then pct else 0 end) as v3_pct,
-        sum(case when report_version = 'v4' then pct else 0 end) as v4_pct
+        {{ aei_version_pct_columns('report_version', 'pct') }}
     from occupational_shares
     group by 1
 

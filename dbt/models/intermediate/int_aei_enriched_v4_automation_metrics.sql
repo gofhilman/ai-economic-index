@@ -5,27 +5,7 @@ with scaffold_rows as (
 
 ),
 
-filtered_countries as (
-
-    select distinct geo_id
-    from scaffold_rows
-    where geography = 'country'
-      and facet = 'country'
-      and variable = 'usage_count'
-      and value >= 200
-
-),
-
-filtered_us_states as (
-
-    select distinct geo_id
-    from scaffold_rows
-    where geography = 'country-state'
-      and facet = 'country-state'
-      and variable = 'usage_count'
-      and value >= 100
-
-),
+{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
 
 collaboration_count_rows as (
 
@@ -61,11 +41,7 @@ eligible_collaboration_rows as (
     select *
     from collaboration_count_rows
     where category is not null
-      and (
-            geography = 'global'
-            or (geography = 'country' and geo_id in (select geo_id from filtered_countries))
-            or (geography = 'country-state' and geo_id in (select geo_id from filtered_us_states))
-        )
+      and {{ aei_v4_threshold_eligible_geography_condition(include_global=true) }}
 
 ),
 

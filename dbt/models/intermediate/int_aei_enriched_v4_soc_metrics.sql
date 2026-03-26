@@ -5,27 +5,7 @@ with scaffold_rows as (
 
 ),
 
-filtered_countries as (
-
-    select distinct geo_id
-    from scaffold_rows
-    where geography = 'country'
-      and facet = 'country'
-      and variable = 'usage_count'
-      and value >= 200
-
-),
-
-filtered_us_states as (
-
-    select distinct geo_id
-    from scaffold_rows
-    where geography = 'country-state'
-      and facet = 'country-state'
-      and variable = 'usage_count'
-      and value >= 100
-
-),
+{{ aei_v4_filtered_geography_ctes('scaffold_rows') }},
 
 soc_input_rows as (
 
@@ -41,11 +21,7 @@ soc_input_rows as (
     from scaffold_rows
     where facet = 'onet_task'
       and variable = 'onet_task_pct'
-      and (
-            geography = 'global'
-            or (geography = 'country' and geo_id in (select geo_id from filtered_countries))
-            or (geography = 'country-state' and geo_id in (select geo_id from filtered_us_states))
-        )
+      and {{ aei_v4_threshold_eligible_geography_condition(include_global=true) }}
 
 ),
 
@@ -63,8 +39,7 @@ soc_mapped_rows as (
     from soc_input_rows
     inner join {{ ref('int_aei_task_to_soc_group') }} as int_aei_task_to_soc_group
         on lower(trim(soc_input_rows.cluster_name)) = int_aei_task_to_soc_group.task_name
-    where soc_input_rows.cluster_name != 'none'
-      and not regexp_contains(lower(soc_input_rows.cluster_name), r'not_classified')
+    where {{ aei_v4_is_classified_cluster('soc_input_rows.cluster_name') }}
 
 ),
 
