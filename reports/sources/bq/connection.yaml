@@ -1,0 +1,7 @@
+# This file was automatically generated
+name: bq
+type: bigquery
+options:
+  enable_connected_sheets: false
+  authenticator: service-account
+  location: asia-southeast2
