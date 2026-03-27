@@ -4,6 +4,14 @@ sidebar_position: 2
 ---
 
 <script>
+	onMount(() => {
+		const links = document.querySelectorAll('.custom-footer a');
+		links.forEach((a) => {
+			a.setAttribute('target', '_blank');
+			a.setAttribute('rel', 'noopener noreferrer');
+		});
+	});
+
 	const formatPercentPoints = (value, digits = 1) =>
 		typeof value === 'number' ? `${Math.abs(value).toFixed(digits)} percentage points` : 'n/a';
 
@@ -184,5 +192,31 @@ order by share desc, soc_group_display
 	height={viewportWidth < 768 ? '360px' : '520px'}
 />
 </div>
+
+<div class="mt-5 flex flex-col sm:flex-row justify-between gap-4">
+    <a href="/" class="font-medium hover:underline">
+        &larr; Prev: Automation vs Augmentation Trends
+    </a>
+    <a href="/effectiveness-efficiency-in-work" class="font-medium hover:underline sm:text-right">
+        Next: Effectiveness and Efficiency in Work &rarr;
+    </a>
+</div>
+
+<hr style="margin-top: 20px; opacity: 0.3;"/>
+
+<div class="custom-footer">
+
+Created by [Hilman Fikry](https://github.com/gofhilman)  
+The raw data is sourced from [The Anthropic Economic Index](https://huggingface.co/datasets/Anthropic/EconomicIndex)
+
+</div>
+
+<style>
+  .custom-footer p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+</style>
 
 </div>

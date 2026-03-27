@@ -4,6 +4,14 @@ sidebar_position: 3
 ---
 
 <script>
+	onMount(() => {
+		const links = document.querySelectorAll('.custom-footer a');
+		links.forEach((a) => {
+			a.setAttribute('target', '_blank');
+			a.setAttribute('rel', 'noopener noreferrer');
+		});
+	});
+
 	const formatPercent = (value, digits = 1) =>
 		typeof value === 'number' ? `${(value * 100).toFixed(digits)}%` : 'n/a';
 
@@ -428,3 +436,26 @@ limit 10
 </div>
 
 </div>
+
+<div class="mt-5 flex flex-col sm:flex-row justify-between gap-4">
+    <a href="/usage-share-trends" class="font-medium hover:underline">
+        &larr; Prev: Usage Share Trends
+    </a>
+</div>
+
+<hr style="margin-top: 20px; opacity: 0.3;"/>
+
+<div class="custom-footer">
+
+Created by [Hilman Fikry](https://github.com/gofhilman)  
+The raw data is sourced from [The Anthropic Economic Index](https://huggingface.co/datasets/Anthropic/EconomicIndex)
+
+</div>
+
+<style>
+  .custom-footer p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+</style>
