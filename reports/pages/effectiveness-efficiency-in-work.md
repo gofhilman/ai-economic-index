@@ -12,6 +12,21 @@ sidebar_position: 3
 
 	let viewportWidth = 1280;
 
+	$: compactLayout = viewportWidth < 768;
+	$: maxLabelLength = compactLayout ? 18 : 34;
+	$: formatAxisLabel = (value) =>
+		typeof value === 'string' && value.length > maxLabelLength ? `${value.slice(0, maxLabelLength - 1)}...` : value;
+
+	$: page3TopTasksFormatted = page3_selected_top_tasks
+		? Array.from(page3_selected_top_tasks).map((row) => ({
+				task:
+					typeof row.task === 'string' && row.task.length > 100
+						? `${row.task.slice(0, 97)}...`
+						: row.task,
+				share: row.share
+		  }))
+		: [];
+
 	function getPaddedDomain(rows, lowerKey, upperKey, fallbackMin, fallbackMax) {
 		const bounds = rows
 			.flatMap((row) => [row?.[lowerKey], row?.[upperKey]])
@@ -34,20 +49,17 @@ sidebar_position: 3
 		};
 	}
 
-	function buildRangeChartConfig(rows, options) {
-		const compactLayout = viewportWidth < 768;
-		const labelWidth = compactLayout ? 96 : 180;
-		const maxLabelLength = compactLayout ? 18 : 34;
-		const formatAxisLabel = (value) =>
-			value.length > maxLabelLength ? `${value.slice(0, maxLabelLength - 1)}...` : value;
+	function buildRangeChartConfig(rows, options, layoutCompact) {
+		const isCompact = layoutCompact ?? compactLayout;
+		const labelWidth = isCompact ? 96 : 180;
 
 		return {
 			animationDuration: 400,
 			grid: {
-				left: compactLayout ? 8 : 24,
-				right: compactLayout ? 16 : 28,
+				left: isCompact ? 8 : 24,
+				right: isCompact ? 16 : 28,
 				top: 24,
-				bottom: compactLayout ? 64 : 56,
+				bottom: isCompact ? 64 : 56,
 				containLabel: true
 			},
 			tooltip: {
@@ -68,9 +80,9 @@ sidebar_position: 3
 				max: options.xMax,
 				name: options.xAxisName,
 				nameLocation: 'middle',
-				nameGap: compactLayout ? 28 : 34,
+				nameGap: isCompact ? 28 : 34,
 				nameTextStyle: {
-					fontSize: compactLayout ? 11 : 12
+					fontSize: isCompact ? 11 : 12
 				},
 				axisLabel: {
 					formatter: options.axisFormatter
@@ -86,7 +98,7 @@ sidebar_position: 3
 				axisLabel: {
 					width: labelWidth,
 					overflow: 'truncate',
-					margin: compactLayout ? 8 : 12,
+					margin: isCompact ? 8 : 12,
 					formatter: formatAxisLabel
 				}
 			},
@@ -168,7 +180,7 @@ sidebar_position: 3
 		valueFormatter: (value) => formatAutonomy(value),
 		lineColor: '#93c5fd',
 		pointColor: '#2563eb'
-	});
+	}, compactLayout);
 
 	$: page3TimeSavingsConfig = buildRangeChartConfig(page3TimeSavingsRows, {
 		valueKey: 'time_savings_ratio',
@@ -182,7 +194,7 @@ sidebar_position: 3
 		valueFormatter: (value) => formatPercent(value),
 		lineColor: '#f0abfc',
 		pointColor: '#c2410c'
-	});
+	}, compactLayout);
 </script>
 
 <svelte:window bind:innerWidth={viewportWidth} />
@@ -198,7 +210,6 @@ order by work_use_case_pct desc, soc_group_display
 ```sql page3_task_success_data
 select
     soc_group_display,
-    case when length(soc_group_display) > 25 then substr(soc_group_display, 1, 23) || '...' else soc_group_display end as soc_group_display_short,
     task_success_rate
 from bq.work_soc_outcomes_display
 where task_success_rate is not null
@@ -231,7 +242,6 @@ order by work_use_case_pct desc, soc_group_display
 with base as (
     select
         soc_group_display,
-        case when length(soc_group_display) > 25 then substr(soc_group_display, 1, 23) || '...' else soc_group_display end as soc_group_display_short,
         work_use_case_pct,
         human_only_ability_requires_ai_rate,
         human_only_rate
@@ -242,7 +252,6 @@ with base as (
 
 select
     soc_group_display,
-    soc_group_display_short,
     work_use_case_pct,
     'Requires AI' as rate_label,
     human_only_ability_requires_ai_rate as share,
@@ -253,7 +262,6 @@ union all
 
 select
     soc_group_display,
-    soc_group_display_short,
     work_use_case_pct,
     'Human Only' as rate_label,
     human_only_rate as share,
@@ -265,7 +273,7 @@ order by work_use_case_pct desc, soc_group_display, rate_sort
 
 ```sql page3_selected_top_tasks
 select
-    case when length(task_name) > 60 then substr(task_name, 1, 57) || '...' else task_name end as task,
+    task_name as task,
     onet_task_share as share
 from bq.work_soc_top_tasks
 where soc_group_display = coalesce(
@@ -281,13 +289,20 @@ limit 10
 <div>
 <BarChart
 	data={page3_task_success_data}
-	x=soc_group_display_short
+	x=soc_group_display
 	y=task_success_rate
 	swapXY=true
 	sort=false
 	title="Task Success Rate by Occupation"
 	yFmt="pct1"
 	chartAreaHeight={Math.max(480, (page3_task_success_data?.length ?? 0) * 28)}
+	echartsOptions={{
+		yAxis: {
+			axisLabel: {
+				formatter: formatAxisLabel
+			}
+		}
+	}}
 />
 </div>
 
@@ -312,7 +327,7 @@ limit 10
 <div>
 <BarChart
 	data={page3_requires_ai_vs_human_only}
-	x=soc_group_display_short
+	x=soc_group_display
 	y=share
 	series=rate_label
 	swapXY=true
@@ -322,6 +337,13 @@ limit 10
 	yFmt="pct0"
 	seriesOrder={['Requires AI', 'Human Only']}
 	chartAreaHeight={Math.max(480, ((page3_requires_ai_vs_human_only?.length ?? 0) / 2) * 28)}
+	echartsOptions={{
+		yAxis: {
+			axisLabel: {
+				formatter: formatAxisLabel
+			}
+		}
+	}}
 />
 </div>
 
@@ -336,7 +358,7 @@ limit 10
 	title="Occupation"
 />
 
-<DataTable data={page3_selected_top_tasks} title="Top 10 Tasks for Selected Occupation">
+<DataTable data={page3TopTasksFormatted} title="Top 10 Tasks for Selected Occupation">
 	<Column id=task />
 	<Column id=share fmt="pct1" />
 </DataTable>
