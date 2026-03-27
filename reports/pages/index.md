@@ -132,15 +132,14 @@ where report_version = coalesce(
 order by share desc, interaction_label
 ```
 
-<div class="space-y-8">
+### Automation vs Augmentation Share by Release
 
-<div>
+<div class="mb-8">
 <LineChart
 	data={page1_automation_totals_long}
 	x=report_release_date
 	y=share
 	series=total_type
-	title="Automation vs Augmentation Share by Release"
 	xFmt="mmmm yyyy"
 	yFmt="pct1"
 	seriesOrder={['Automation', 'Augmentation']}
@@ -169,7 +168,9 @@ order by share desc, interaction_label
 </Details>
 </div>
 
-<div class="space-y-3">
+### Interaction Pattern Shares by Release
+
+<div class="space-y-3 mb-8 -mt-4">
 <ButtonGroup
 	data={page1_interaction_filter_options}
 	name=page1_interaction_filter
@@ -185,7 +186,6 @@ order by share desc, interaction_label
 	x=report_release_date
 	y=share
 	series=interaction_label
-	title="Interaction Pattern Shares by Release"
 	xFmt="mmmm yyyy"
 	yFmt="pct1"
 	seriesOrder={['Directive', 'Feedback Loop', 'Validation', 'Task Iteration', 'Learning']}
@@ -194,6 +194,8 @@ order by share desc, interaction_label
 	markerSize=8
 />
 </div>
+
+### Interaction Pattern Composition for Selected Release
 
 <div class="space-y-0">
 <Dropdown
@@ -209,10 +211,8 @@ order by share desc, interaction_label
 <ECharts
 	data={page1_release_pattern_mix}
 	config={page1InteractionPieConfig}
-	evidenceChartTitle="Interaction Pattern Composition for Selected Release"
 	height={viewportWidth < 768 ? '340px' : '420px'}
 />
-</div>
 
 </div>
 

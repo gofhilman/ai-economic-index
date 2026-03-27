@@ -137,6 +137,8 @@ where report_version = coalesce(
 order by share desc, soc_group_display
 ```
 
+### Occupation Usage Share Trend by Release
+
 <Dropdown
 	data={page2_occupation_options}
 	name=page2_occupation
@@ -147,14 +149,13 @@ order by share desc, soc_group_display
 	title="Occupation"
 />
 
-<div class="space-y-8">
+<div class="space-y-8 mt-5">
 
 <div>
 <AreaChart
 	data={page2_selected_occupation_trend}
 	x=report_release_date
 	y=share
-	title="Occupation Usage Share by Release"
 	xFmt="mmmm yyyy"
 	yFmt="pct1"
 	line=true
@@ -173,6 +174,9 @@ order by share desc, soc_group_display
 		</p>
 	{/if}
 </div>
+</div>
+
+### Occupation Usage Share for Selected Release
 
 <div class="space-y-0">
 <Dropdown
@@ -188,10 +192,10 @@ order by share desc, soc_group_display
 <ECharts
 	data={page2_release_occupation_mix}
 	config={page2OccupationPieConfig}
-	evidenceChartTitle="Occupation Usage Share for Selected Release"
 	height={viewportWidth < 768 ? '360px' : '520px'}
 />
 </div>
+
 
 <div class="mt-5 flex flex-col sm:flex-row justify-between gap-4">
     <a href="/" class="font-medium hover:underline">
@@ -218,5 +222,3 @@ The raw data is sourced from [The Anthropic Economic Index](https://huggingface.
     margin: 0;
   }
 </style>
-
-</div>

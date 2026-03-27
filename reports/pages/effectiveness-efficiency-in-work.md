@@ -75,7 +75,7 @@ sidebar_position: 3
 			grid: {
 				left: isCompact ? 8 : 24,
 				right: isCompact ? 16 : 28,
-				top: 50,
+				top: 20,
 				bottom: isCompact ? 64 : 56,
 				containLabel: true
 			},
@@ -188,7 +188,6 @@ sidebar_position: 3
 	$: page3AutonomyConfig = buildRangeChartConfig(
 		page3AutonomyRows,
 		{
-			title: 'AI Autonomy Score With 95% Confidence Intervals',
 			valueKey: 'ai_autonomy_score',
 			lowerKey: 'ai_autonomy_score_ci_lower',
 			upperKey: 'ai_autonomy_score_ci_upper',
@@ -207,7 +206,6 @@ sidebar_position: 3
 	$: page3TimeSavingsConfig = buildRangeChartConfig(
 		page3TimeSavingsRows,
 		{
-			title: 'Time Savings Ratio With 95% Confidence Intervals',
 			valueKey: 'time_savings_ratio',
 			lowerKey: 'time_savings_ratio_ci_lower',
 			upperKey: 'time_savings_ratio_ci_upper',
@@ -311,7 +309,7 @@ order by onet_task_share desc, task
 limit 10
 ```
 
-<div class="space-y-8">
+
 
 <div class="grid gap-4 xl:grid-cols-2">
 <Details title="Task success">
@@ -354,14 +352,15 @@ limit 10
 </Details>
 </div>
 
-<div>
+### Task Success Rate by Occupation
+
+<div class="mb-8">
 <BarChart
 	data={page3_task_success_data}
 	x=soc_group_display
 	y=task_success_rate
 	swapXY=true
 	sort=false
-	title="Task Success Rate by Occupation"
 	yFmt="pct1"
 	chartAreaHeight={Math.max(480, (page3_task_success_data?.length ?? 0) * 28)}
 	echartsOptions={{
@@ -374,27 +373,31 @@ limit 10
 />
 </div>
 
-<div>
+### AI Autonomy Score by Occupation
+
+<div class="mb-8">
 <ECharts
 	data={page3_ai_autonomy_rows}
-	title="AI Autonomy Score by Occupation"
 	config={page3AutonomyConfig}
 	evidenceChartTitle="AI Autonomy Score With 95% Confidence Intervals"
 	height={`${Math.max(480, (page3_ai_autonomy_rows?.length ?? 0) * 28)}px`}
 />
 </div>
 
-<div>
+### Time Savings Ratio by Occupation
+
+<div class="mb-8">
 <ECharts
 	data={page3_time_savings_rows}
-	title="Time Savings Ratio by Occupation"
 	config={page3TimeSavingsConfig}
 	evidenceChartTitle="Time Savings Ratio With 95% Confidence Intervals"
 	height={`${Math.max(480, (page3_time_savings_rows?.length ?? 0) * 28)}px`}
 />
 </div>
 
-<div>
+### Requires AI vs Human-Only by Occupation
+
+<div class="mb-8">
 <BarChart
 	data={page3_requires_ai_vs_human_only}
 	x=soc_group_display
@@ -403,7 +406,6 @@ limit 10
 	swapXY=true
 	sort=false
 	type="stacked100"
-	title="Requires AI vs Human-Only by Occupation"
 	yFmt="pct0"
 	seriesOrder={['Requires AI', 'Human Only']}
 	chartAreaHeight={Math.max(480, ((page3_requires_ai_vs_human_only?.length ?? 0) / 2) * 28)}
@@ -417,6 +419,8 @@ limit 10
 />
 </div>
 
+### Top 10 Tasks for Selected Occupation
+
 <div class="space-y-2">
 <Dropdown
 	data={page3_occupation_options}
@@ -428,14 +432,14 @@ limit 10
 	title="Occupation"
 />
 
-<DataTable data={page3TopTasksFormatted} title="Top 10 Tasks for Selected Occupation">
+<DataTable data={page3TopTasksFormatted}>
 	<Column id=no title="No." />
 	<Column id=task />
 	<Column id=share fmt="pct1" />
 </DataTable>
 </div>
 
-</div>
+
 
 <div class="mt-5 flex flex-col sm:flex-row justify-between gap-4">
     <a href="/usage-share-trends" class="font-medium hover:underline">
