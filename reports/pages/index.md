@@ -142,6 +142,25 @@ order by share desc, interaction_label
 />
 </div>
 
+<div class="grid gap-6 xl:grid-cols-2">
+<Details title="Automation">
+<p><strong>Automation</strong> encompasses interaction patterns focused on task completion:</p>
+<ul class="list-disc pl-4">
+	<li><strong>Directive</strong>: Users give Claude a task and it completes it with minimal back-and-forth</li>
+	<li><strong>Feedback Loops</strong>: Users automate tasks and provide feedback to Claude as needed</li>
+</ul>
+</Details>
+
+<Details title="Augmentation">
+<p><strong>Augmentation</strong> focuses on collaborative interaction patterns:</p>
+<ul class="list-disc pl-4">
+	<li><strong>Learning</strong>: Users ask Claude for information or explanations about various topics</li>
+	<li><strong>Task Iteration</strong>: Users iterate on tasks collaboratively with Claude</li>
+	<li><strong>Validation</strong>: Users ask Claude for feedback on their work</li>
+</ul>
+</Details>
+</div>
+
 <div class="space-y-3">
 <ButtonGroup
 	data={page1_interaction_filter_options}
@@ -185,25 +204,6 @@ order by share desc, interaction_label
 	evidenceChartTitle="Interaction Pattern Composition for Selected Release"
 	height={viewportWidth < 768 ? '340px' : '420px'}
 />
-</div>
-
-<div class="grid gap-6 xl:grid-cols-2">
-<Details title="Automation details">
-<p>Automation encompasses interaction patterns focused on task completion:</p>
-<ul>
-	<li>Directive: Users give Claude a task and it completes it with minimal back-and-forth</li>
-	<li>Feedback Loops: Users automate tasks and provide feedback to Claude as needed</li>
-</ul>
-</Details>
-
-<Details title="Augmentation details">
-<p>Augmentation focuses on collaborative interaction patterns:</p>
-<ul>
-	<li>Learning: Users ask Claude for information or explanations about various topics</li>
-	<li>Task Iteration: Users iterate on tasks collaboratively with Claude</li>
-	<li>Validation: Users ask Claude for feedback on their work</li>
-</ul>
-</Details>
 </div>
 
 </div>

@@ -13,12 +13,13 @@ sidebar_position: 3
 	let viewportWidth = 1280;
 
 	$: compactLayout = viewportWidth < 768;
-	$: maxLabelLength = compactLayout ? 18 : 34;
+	$: maxLabelLength = compactLayout ? 24 : 45;
 	$: formatAxisLabel = (value) =>
 		typeof value === 'string' && value.length > maxLabelLength ? `${value.slice(0, maxLabelLength - 1)}...` : value;
 
 	$: page3TopTasksFormatted = page3_selected_top_tasks
-		? Array.from(page3_selected_top_tasks).map((row) => ({
+		? Array.from(page3_selected_top_tasks).map((row, index) => ({
+				no: index + 1,
 				task:
 					typeof row.task === 'string' && row.task.length > 100
 						? `${row.task.slice(0, 97)}...`
@@ -51,14 +52,22 @@ sidebar_position: 3
 
 	function buildRangeChartConfig(rows, options, layoutCompact) {
 		const isCompact = layoutCompact ?? compactLayout;
-		const labelWidth = isCompact ? 96 : 180;
+		const labelWidth = isCompact ? 120 : 250;
 
 		return {
+			title: {
+				text: options.title,
+				top: 0,
+				textStyle: {
+					fontSize: 14,
+					fontWeight: '600'
+				}
+			},
 			animationDuration: 400,
 			grid: {
 				left: isCompact ? 8 : 24,
 				right: isCompact ? 16 : 28,
-				top: 24,
+				top: 50,
 				bottom: isCompact ? 64 : 56,
 				containLabel: true
 			},
@@ -168,33 +177,43 @@ sidebar_position: 3
 		1
 	);
 
-	$: page3AutonomyConfig = buildRangeChartConfig(page3AutonomyRows, {
-		valueKey: 'ai_autonomy_score',
-		lowerKey: 'ai_autonomy_score_ci_lower',
-		upperKey: 'ai_autonomy_score_ci_upper',
-		xMin: 1,
-		xMax: 5,
-		xAxisName: 'AI autonomy score',
-		tooltipLabel: 'AI autonomy score',
-		axisFormatter: (value) => value.toFixed(1),
-		valueFormatter: (value) => formatAutonomy(value),
-		lineColor: '#93c5fd',
-		pointColor: '#2563eb'
-	}, compactLayout);
+	$: page3AutonomyConfig = buildRangeChartConfig(
+		page3AutonomyRows,
+		{
+			title: 'AI Autonomy Score With 95% Confidence Intervals',
+			valueKey: 'ai_autonomy_score',
+			lowerKey: 'ai_autonomy_score_ci_lower',
+			upperKey: 'ai_autonomy_score_ci_upper',
+			xMin: 1,
+			xMax: 5,
+			xAxisName: 'AI autonomy score',
+			tooltipLabel: 'AI autonomy score',
+			axisFormatter: (value) => value.toFixed(1),
+			valueFormatter: (value) => formatAutonomy(value),
+			lineColor: '#93c5fd',
+			pointColor: '#2563eb'
+		},
+		compactLayout
+	);
 
-	$: page3TimeSavingsConfig = buildRangeChartConfig(page3TimeSavingsRows, {
-		valueKey: 'time_savings_ratio',
-		lowerKey: 'time_savings_ratio_ci_lower',
-		upperKey: 'time_savings_ratio_ci_upper',
-		xMin: page3TimeSavingsDomain.min,
-		xMax: page3TimeSavingsDomain.max,
-		xAxisName: 'Time savings ratio',
-		tooltipLabel: 'Time savings ratio',
-		axisFormatter: (value) => `${Math.round(value * 100)}%`,
-		valueFormatter: (value) => formatPercent(value),
-		lineColor: '#f0abfc',
-		pointColor: '#c2410c'
-	}, compactLayout);
+	$: page3TimeSavingsConfig = buildRangeChartConfig(
+		page3TimeSavingsRows,
+		{
+			title: 'Time Savings Ratio With 95% Confidence Intervals',
+			valueKey: 'time_savings_ratio',
+			lowerKey: 'time_savings_ratio_ci_lower',
+			upperKey: 'time_savings_ratio_ci_upper',
+			xMin: page3TimeSavingsDomain.min,
+			xMax: page3TimeSavingsDomain.max,
+			xAxisName: 'Time savings ratio',
+			tooltipLabel: 'Time savings ratio',
+			axisFormatter: (value) => `${Math.round(value * 100)}%`,
+			valueFormatter: (value) => formatPercent(value),
+			lineColor: '#f0abfc',
+			pointColor: '#c2410c'
+		},
+		compactLayout
+	);
 </script>
 
 <svelte:window bind:innerWidth={viewportWidth} />
@@ -286,6 +305,47 @@ limit 10
 
 <div class="space-y-8">
 
+<div class="grid gap-4 xl:grid-cols-2">
+<Details title="Task success">
+<p>Did the Assistant complete the task provided by the User successfully?</p>
+<ul class="list-disc pl-4">
+	<li><strong>Yes</strong>: the Assistant completed the task provided by the User successfully</li>
+	<li><strong>No</strong>: the Assistant did not complete the task provided by the User successfully</li>
+</ul>
+</Details>
+
+<Details title="AI autonomy score">
+<p>
+	Estimate how much autonomy the Assistant had to make decisions in this conversation (a
+	discrete number ranging from 1 - 5, where 1 is none and 5 is extreme).
+</p>
+</Details>
+
+<Details title="Time savings ratio">
+<p>The ratio of human with AI time estimate to human time estimate</p>
+<ul class="list-disc pl-4">
+	<li>
+		<strong>Human time estimate</strong>: Estimate how many hours a competent professional would need to complete the tasks done by the Assistant. Assume they have the necessary domain knowledge and skills, all relevant context and background information, and access to required tools and resources.
+	</li>
+	<li>
+		<strong>Human with AI time estimate</strong>: Estimate how many minutes the User spent completing the tasks in the prompt with the Assistant. Consider the number and complexity of User messages, time reading Assistant responses, no access to AI tools to assist with the work, realistic typing and reading speeds, time thinking and formulating questions, time reviewing outputs and iterating, and time implementing suggestions or running code outside of the conversation when directly relevant.
+	</li>
+</ul>
+</Details>
+
+<Details title="Human ability to complete task alone">
+<p>Could the User have completed this task by themselves?</p>
+<ul class="list-disc pl-4">
+	<li>
+		<strong>Yes</strong>: the User would have been able to complete the task without the Assistant, even if it would have taken more time
+	</li>
+	<li>
+		<strong>No</strong>: the User would not have been able to complete the task without the Assistant, even with more time
+	</li>
+</ul>
+</Details>
+</div>
+
 <div>
 <BarChart
 	data={page3_task_success_data}
@@ -309,6 +369,7 @@ limit 10
 <div>
 <ECharts
 	data={page3_ai_autonomy_rows}
+	title="AI Autonomy Score by Occupation"
 	config={page3AutonomyConfig}
 	evidenceChartTitle="AI Autonomy Score With 95% Confidence Intervals"
 	height={`${Math.max(480, (page3_ai_autonomy_rows?.length ?? 0) * 28)}px`}
@@ -318,6 +379,7 @@ limit 10
 <div>
 <ECharts
 	data={page3_time_savings_rows}
+	title="Time Savings Ratio by Occupation"
 	config={page3TimeSavingsConfig}
 	evidenceChartTitle="Time Savings Ratio With 95% Confidence Intervals"
 	height={`${Math.max(480, (page3_time_savings_rows?.length ?? 0) * 28)}px`}
@@ -359,60 +421,10 @@ limit 10
 />
 
 <DataTable data={page3TopTasksFormatted} title="Top 10 Tasks for Selected Occupation">
+	<Column id=no title="No." />
 	<Column id=task />
 	<Column id=share fmt="pct1" />
 </DataTable>
-</div>
-
-<div class="grid gap-4 xl:grid-cols-2">
-<Details title="Task success details">
-<p>Did the Assistant complete the task provided by the User successfully? Choose from these options:</p>
-<ul>
-	<li>Yes: the Assistant completed the task provided by the User successfully</li>
-	<li>No: the Assistant did not complete the task provided by the User successfully</li>
-</ul>
-</Details>
-
-<Details title="AI autonomy score details">
-<p>
-	Estimate how much autonomy the Assistant had to make decisions in this conversation (a
-	discrete number ranging from 1 - 5, where 1 is none and 5 is extreme).
-</p>
-</Details>
-
-<Details title="Time savings ratio details">
-<ul>
-	<li>The ratio of human with AI time estimate to human time estimate</li>
-	<li>
-		Human time estimate: Estimate how many hours a competent professional would need to
-		complete the tasks done by the Assistant. Assume they have the necessary domain
-		knowledge and skills, all relevant context and background information, and access to
-		required tools and resources.
-	</li>
-	<li>
-		Human with AI time estimate: Estimate how many minutes the User spent completing the
-		tasks in the prompt with the Assistant. Consider the number and complexity of User
-		messages, time reading Assistant responses, no access to AI tools to assist with the
-		work, realistic typing and reading speeds, time thinking and formulating questions, time
-		reviewing outputs and iterating, and time implementing suggestions or running code
-		outside of the conversation when directly relevant.
-	</li>
-</ul>
-</Details>
-
-<Details title="Human ability to complete task alone details">
-<p>Could the User have completed this task by themselves? Choose from these options:</p>
-<ul>
-	<li>
-		Yes: the User would have been able to complete the task without the Assistant, even if
-		it would have taken more time
-	</li>
-	<li>
-		No: the User would not have been able to complete the task without the Assistant, even
-		with more time
-	</li>
-</ul>
-</Details>
 </div>
 
 </div>
