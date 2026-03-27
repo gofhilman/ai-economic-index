@@ -15,17 +15,16 @@ jobs:
         with:
           node-version: 20
           cache: npm
-
+          cache-dependency-path: reports/package-lock.json
+      
       - name: Install dependencies
-        run: npm install
-
+        run: cd reports && npm install
+      
       - name: build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
-          ## Add and uncomment any environment variables here
-          ## EVIDENCE_SOURCE__my_source__username: ${{ secrets.EVIDENCE_SOURCE__MY_SOURCE__USERNAME }}
-          ## EVIDENCE_SOURCE__my_source__private_key: ${{ secrets.EVIDENCE_SOURCE__MY_SOURCE__PRIVATE_KEY }}
         run: |
+          cd reports
           npm run sources
           npm run build
 
