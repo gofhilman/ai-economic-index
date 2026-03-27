@@ -35,6 +35,7 @@ sidebar_position: 2
 			itemWidth: viewportWidth < 768 ? 10 : 14,
 			itemHeight: viewportWidth < 768 ? 10 : 14,
 			textStyle: {
+				padding: [0, 0, 0, 4],
 				fontSize: viewportWidth < 768 ? 11 : 12
 			}
 		},
@@ -43,7 +44,7 @@ sidebar_position: 2
 				name: 'Occupation Usage Share',
 				type: 'pie',
 				radius: viewportWidth < 768 ? '54%' : '68%',
-				center: viewportWidth < 768 ? ['50%', '38%'] : ['34%', '50%'],
+				center: viewportWidth < 768 ? ['50%', '42%'] : ['34%', '50%'],
 				itemStyle: {
 					borderColor: '#ffffff',
 					borderWidth: 2
@@ -66,7 +67,8 @@ sidebar_position: 2
 select distinct
     report_version,
     report_release_date,
-    report_release_label
+    report_release_label,
+    dense_rank() over (order by report_release_date desc) as sort_order
 from bq.occupational_trends_long
 order by report_release_date desc
 ```
@@ -164,12 +166,13 @@ order by share desc, soc_group_display
 	{/if}
 </div>
 
-<div class="space-y-2">
+<div class="space-y-0">
 <Dropdown
 	data={page2_release_options}
 	name=page2_release
 	value=report_version
 	label=report_release_label
+	order=sort_order
 	defaultValue="v5"
 	title="Report release"
 />
@@ -178,7 +181,7 @@ order by share desc, soc_group_display
 	data={page2_release_occupation_mix}
 	config={page2OccupationPieConfig}
 	evidenceChartTitle="Occupation Usage Share for Selected Release"
-	height={viewportWidth < 768 ? '620px' : '520px'}
+	height={viewportWidth < 768 ? '360px' : '520px'}
 />
 </div>
 

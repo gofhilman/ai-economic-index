@@ -198,6 +198,7 @@ order by work_use_case_pct desc, soc_group_display
 ```sql page3_task_success_data
 select
     soc_group_display,
+    case when length(soc_group_display) > 25 then substr(soc_group_display, 1, 23) || '...' else soc_group_display end as soc_group_display_short,
     task_success_rate
 from bq.work_soc_outcomes_display
 where task_success_rate is not null
@@ -230,6 +231,7 @@ order by work_use_case_pct desc, soc_group_display
 with base as (
     select
         soc_group_display,
+        case when length(soc_group_display) > 25 then substr(soc_group_display, 1, 23) || '...' else soc_group_display end as soc_group_display_short,
         work_use_case_pct,
         human_only_ability_requires_ai_rate,
         human_only_rate
@@ -240,6 +242,7 @@ with base as (
 
 select
     soc_group_display,
+    soc_group_display_short,
     work_use_case_pct,
     'Requires AI' as rate_label,
     human_only_ability_requires_ai_rate as share,
@@ -250,6 +253,7 @@ union all
 
 select
     soc_group_display,
+    soc_group_display_short,
     work_use_case_pct,
     'Human Only' as rate_label,
     human_only_rate as share,
@@ -261,8 +265,8 @@ order by work_use_case_pct desc, soc_group_display, rate_sort
 
 ```sql page3_selected_top_tasks
 select
-    task_name as task,
-    format('%.1f%%', onet_task_share * 100) as share
+    case when length(task_name) > 60 then substr(task_name, 1, 57) || '...' else task_name end as task,
+    onet_task_share as share
 from bq.work_soc_top_tasks
 where soc_group_display = coalesce(
     nullif('${inputs.page3_occupation.value}', 'undefined'),
@@ -277,7 +281,7 @@ limit 10
 <div>
 <BarChart
 	data={page3_task_success_data}
-	x=soc_group_display
+	x=soc_group_display_short
 	y=task_success_rate
 	swapXY=true
 	sort=false
@@ -308,7 +312,7 @@ limit 10
 <div>
 <BarChart
 	data={page3_requires_ai_vs_human_only}
-	x=soc_group_display
+	x=soc_group_display_short
 	y=share
 	series=rate_label
 	swapXY=true
@@ -332,7 +336,10 @@ limit 10
 	title="Occupation"
 />
 
-<DataTable data={page3_selected_top_tasks} title="Top 10 Tasks for Selected Occupation" />
+<DataTable data={page3_selected_top_tasks} title="Top 10 Tasks for Selected Occupation">
+	<Column id=task />
+	<Column id=share fmt="pct1" />
+</DataTable>
 </div>
 
 <div class="grid gap-4 xl:grid-cols-2">
