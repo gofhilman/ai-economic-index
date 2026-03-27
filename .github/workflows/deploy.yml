@@ -23,6 +23,12 @@ jobs:
       - name: build
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
+          EVIDENCE_SOURCE__BQ__AUTHENTICATOR: ${{ secrets.EVIDENCE_SOURCE__BQ__AUTHENTICATOR }}
+          EVIDENCE_SOURCE__BQ__CLIENT_EMAIL: ${{ secrets.EVIDENCE_SOURCE__BQ__CLIENT_EMAIL }}
+          EVIDENCE_SOURCE__BQ__ENABLE_CONNECTED_SHEETS: ${{ secrets.EVIDENCE_SOURCE__BQ__ENABLE_CONNECTED_SHEETS }}
+          EVIDENCE_SOURCE__BQ__LOCATION: ${{ secrets.EVIDENCE_SOURCE__BQ__LOCATION }}
+          EVIDENCE_SOURCE__BQ__PRIVATE_KEY: ${{ secrets.EVIDENCE_SOURCE__BQ__PRIVATE_KEY }}
+          EVIDENCE_SOURCE__BQ__PROJECT_ID: ${{ secrets.EVIDENCE_SOURCE__BQ__PROJECT_ID }}
         run: |
           cd reports
           npm run sources
