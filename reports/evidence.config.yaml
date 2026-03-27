@@ -1,6 +1,3 @@
-duckdb:
-  useRemoteWasm: true
-
 appearance:
   default: system
   switcher: true
