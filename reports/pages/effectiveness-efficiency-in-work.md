@@ -152,7 +152,7 @@ sidebar_position: 3
 				},
 				{
 					type: 'scatter',
-					symbolSize: 10,
+					symbolSize: 9,
 					itemStyle: {
 						color: options.pointColor
 					},

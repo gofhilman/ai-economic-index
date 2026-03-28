@@ -4,10 +4,16 @@ models:
   - name: mart_aei_work_soc_outcomes
     description: >
       SOC-group reporting mart for the February 5-12, 2026 Claude.ai AEI slice,
-      filtered to global work use cases. Because the source mart exposes `work` as
-      a task intersection while the requested outcome metrics are task-level, the
-      model approximates the work-only view by reweighting each task's metrics by
-      its observed work-use-case share before rolling them up to SOC groups.
+      filtered to global work use cases. Updated to use variance propagation 
+      (1.96 * Standard Error) for calculating Confidence Intervals (CIs) instead 
+      of averaging pre-built bounds. 
+
+      Continuous time metrics (human_only_time, human_with_ai_time) now use the
+      task-level median as the central tendency rather than the mean to reduce
+      sensitivity to outliers; the SOC-level value is a weighted average of 
+      task-level medians. The ai_autonomy metric continues to use the 
+      task-level mean. All ratio calculations (e.g., time_savings_ratio) utilize 
+      `safe_divide` to prevent division by zero errors.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -103,50 +109,73 @@ models:
           - not_null
       - name: ai_autonomy_score
         data_type: float64
-        description: Work-weighted AI autonomy mean for the SOC group.
+        description: >
+          Work-weighted AI autonomy score for the SOC group, computed as a weighted
+          average of task-level means.
       - name: ai_autonomy_score_ci_lower
         data_type: float64
-        description: Work-weighted lower 95% confidence bound for AI autonomy.
+        description: >
+          Lower 95% confidence bound for the AI autonomy score, derived from
+          propagated task-level variance (Score - 1.96 * SE).
       - name: ai_autonomy_score_ci_upper
         data_type: float64
-        description: Work-weighted upper 95% confidence bound for AI autonomy.
+        description: >
+          Upper 95% confidence bound for the AI autonomy score, derived from
+          propagated task-level variance (Score + 1.96 * SE).
       - name: human_only_time_observation_count
         data_type: float64
         description: Estimated number of work observations contributing to the human-only time metric.
         data_tests:
           - not_null
-      - name: human_only_time_mean
+      - name: human_only_time_median
         data_type: float64
-        description: Work-weighted mean time for a human to complete the task without AI.
-      - name: human_only_time_mean_ci_lower
+        description: >
+          Work-weighted median time for a human to complete the task without AI,
+          computed as a weighted average of task-level medians.
+      - name: human_only_time_median_ci_lower
         data_type: float64
-        description: Work-weighted lower 95% confidence bound for human-only time.
-      - name: human_only_time_mean_ci_upper
+        description: >
+          Lower 95% confidence bound for human-only time, derived from
+          propagated task-level variance.
+      - name: human_only_time_median_ci_upper
         data_type: float64
-        description: Work-weighted upper 95% confidence bound for human-only time.
+        description: >
+          Upper 95% confidence bound for human-only time, derived from
+          propagated task-level variance.
       - name: human_with_ai_time_observation_count
         data_type: float64
         description: Estimated number of work observations contributing to the human-with-AI time metric.
         data_tests:
           - not_null
-      - name: human_with_ai_time_mean
+      - name: human_with_ai_time_median
         data_type: float64
-        description: Work-weighted mean time for a human to complete the task with AI assistance.
-      - name: human_with_ai_time_mean_ci_lower
+        description: >
+          Work-weighted median time for a human to complete the task with AI assistance,
+          computed as a weighted average of task-level medians.
+      - name: human_with_ai_time_median_ci_lower
         data_type: float64
-        description: Work-weighted lower 95% confidence bound for human-with-AI time.
-      - name: human_with_ai_time_mean_ci_upper
+        description: >
+          Lower 95% confidence bound for human-with-AI time, derived from
+          propagated task-level variance.
+      - name: human_with_ai_time_median_ci_upper
         data_type: float64
-        description: Work-weighted upper 95% confidence bound for human-with-AI time.
+        description: >
+          Upper 95% confidence bound for human-with-AI time, derived from
+          propagated task-level variance.
       - name: time_savings_ratio
         data_type: float64
-        description: Ratio defined as `1 - (human_with_ai_time_mean / human_only_time_mean)`.
+        description: >
+          Ratio defined as `1 - (human_with_ai_time_median / human_only_time_median)`.
       - name: time_savings_ratio_ci_lower
         data_type: float64
-        description: Conservative lower confidence bound for time savings derived from the time mean CIs.
+        description: >
+          Conservative lower confidence bound for time savings, derived from 
+          crossing the new propagated median bounds.
       - name: time_savings_ratio_ci_upper
         data_type: float64
-        description: Conservative upper confidence bound for time savings derived from the time mean CIs.
+        description: >
+          Optimistic upper confidence bound for time savings, derived from 
+          crossing the new propagated median bounds.
       - name: human_only_ability_observation_count
         data_type: float64
         description: Estimated number of work observations contributing to human-only ability.

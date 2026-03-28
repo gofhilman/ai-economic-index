@@ -147,15 +147,13 @@ task_ai_autonomy_metrics as (
         {{ aei_normalize_text("split(cluster_name, '::')[safe_offset(0)]") }} as task_name,
         max(case when variable = 'onet_task_ai_autonomy_count' then value end) as ai_autonomy_count,
         max(case when variable = 'onet_task_ai_autonomy_mean' then value end) as ai_autonomy_mean,
-        max(case when variable = 'onet_task_ai_autonomy_mean_ci_lower' then value end) as ai_autonomy_mean_ci_lower,
-        max(case when variable = 'onet_task_ai_autonomy_mean_ci_upper' then value end) as ai_autonomy_mean_ci_upper
+        max(case when variable = 'onet_task_ai_autonomy_stdev' then value end) as ai_autonomy_stdev
     from base
     where facet = 'onet_task::ai_autonomy'
       and variable in (
           'onet_task_ai_autonomy_count',
           'onet_task_ai_autonomy_mean',
-          'onet_task_ai_autonomy_mean_ci_lower',
-          'onet_task_ai_autonomy_mean_ci_upper'
+          'onet_task_ai_autonomy_stdev'
       )
     group by 1, 2, 3, 4, 5, 6, 7
 
@@ -172,16 +170,14 @@ task_human_only_time_metrics as (
         platform_and_product,
         {{ aei_normalize_text("split(cluster_name, '::')[safe_offset(0)]") }} as task_name,
         max(case when variable = 'onet_task_human_only_time_count' then value end) as human_only_time_count,
-        max(case when variable = 'onet_task_human_only_time_mean' then value end) as human_only_time_mean,
-        max(case when variable = 'onet_task_human_only_time_mean_ci_lower' then value end) as human_only_time_mean_ci_lower,
-        max(case when variable = 'onet_task_human_only_time_mean_ci_upper' then value end) as human_only_time_mean_ci_upper
+        max(case when variable = 'onet_task_human_only_time_median' then value end) as human_only_time_median,
+        max(case when variable = 'onet_task_human_only_time_stdev' then value end) as human_only_time_stdev
     from base
     where facet = 'onet_task::human_only_time'
       and variable in (
           'onet_task_human_only_time_count',
-          'onet_task_human_only_time_mean',
-          'onet_task_human_only_time_mean_ci_lower',
-          'onet_task_human_only_time_mean_ci_upper'
+          'onet_task_human_only_time_median',
+          'onet_task_human_only_time_stdev'
       )
     group by 1, 2, 3, 4, 5, 6, 7
 
@@ -198,16 +194,14 @@ task_human_with_ai_time_metrics as (
         platform_and_product,
         {{ aei_normalize_text("split(cluster_name, '::')[safe_offset(0)]") }} as task_name,
         max(case when variable = 'onet_task_human_with_ai_time_count' then value end) as human_with_ai_time_count,
-        max(case when variable = 'onet_task_human_with_ai_time_mean' then value end) as human_with_ai_time_mean,
-        max(case when variable = 'onet_task_human_with_ai_time_mean_ci_lower' then value end) as human_with_ai_time_mean_ci_lower,
-        max(case when variable = 'onet_task_human_with_ai_time_mean_ci_upper' then value end) as human_with_ai_time_mean_ci_upper
+        max(case when variable = 'onet_task_human_with_ai_time_median' then value end) as human_with_ai_time_median,
+        max(case when variable = 'onet_task_human_with_ai_time_stdev' then value end) as human_with_ai_time_stdev
     from base
     where facet = 'onet_task::human_with_ai_time'
       and variable in (
           'onet_task_human_with_ai_time_count',
-          'onet_task_human_with_ai_time_mean',
-          'onet_task_human_with_ai_time_mean_ci_lower',
-          'onet_task_human_with_ai_time_mean_ci_upper'
+          'onet_task_human_with_ai_time_median',
+          'onet_task_human_with_ai_time_stdev'
       )
     group by 1, 2, 3, 4, 5, 6, 7
 
@@ -231,28 +225,37 @@ soc_rollup_inputs as (
         task_work_weights.work_use_case_count,
         task_work_weights.total_use_case_count,
         task_work_weights.work_share,
+        
         task_work_weights.work_share * coalesce(task_success_metrics.success_yes_count, 0) as estimated_success_yes_work_count,
         task_work_weights.work_share * (
             coalesce(task_success_metrics.success_yes_count, 0)
             + coalesce(task_success_metrics.success_no_count, 0)
         ) as estimated_task_success_work_count,
+        
         task_work_weights.work_share * coalesce(task_human_only_ability_metrics.requires_ai_count, 0) as estimated_requires_ai_work_count,
         task_work_weights.work_share * (
             coalesce(task_human_only_ability_metrics.requires_ai_count, 0)
             + coalesce(task_human_only_ability_metrics.human_only_possible_count, 0)
         ) as estimated_human_only_ability_work_count,
+        
+        -- AI Autonomy
         task_work_weights.work_share * coalesce(task_ai_autonomy_metrics.ai_autonomy_count, 0) as estimated_ai_autonomy_work_count,
+        coalesce(task_ai_autonomy_metrics.ai_autonomy_count, 0) as ai_autonomy_count,
         coalesce(task_ai_autonomy_metrics.ai_autonomy_mean, 0) as ai_autonomy_mean,
-        coalesce(task_ai_autonomy_metrics.ai_autonomy_mean_ci_lower, 0) as ai_autonomy_mean_ci_lower,
-        coalesce(task_ai_autonomy_metrics.ai_autonomy_mean_ci_upper, 0) as ai_autonomy_mean_ci_upper,
+        coalesce(task_ai_autonomy_metrics.ai_autonomy_stdev, 0) as ai_autonomy_stdev,
+        
+        -- Human Only Time
         task_work_weights.work_share * coalesce(task_human_only_time_metrics.human_only_time_count, 0) as estimated_human_only_time_work_count,
-        coalesce(task_human_only_time_metrics.human_only_time_mean, 0) as human_only_time_mean,
-        coalesce(task_human_only_time_metrics.human_only_time_mean_ci_lower, 0) as human_only_time_mean_ci_lower,
-        coalesce(task_human_only_time_metrics.human_only_time_mean_ci_upper, 0) as human_only_time_mean_ci_upper,
+        coalesce(task_human_only_time_metrics.human_only_time_count, 0) as human_only_time_count,
+        coalesce(task_human_only_time_metrics.human_only_time_median, 0) as human_only_time_median,
+        coalesce(task_human_only_time_metrics.human_only_time_stdev, 0) as human_only_time_stdev,
+        
+        -- Human With AI Time
         task_work_weights.work_share * coalesce(task_human_with_ai_time_metrics.human_with_ai_time_count, 0) as estimated_human_with_ai_time_work_count,
-        coalesce(task_human_with_ai_time_metrics.human_with_ai_time_mean, 0) as human_with_ai_time_mean,
-        coalesce(task_human_with_ai_time_metrics.human_with_ai_time_mean_ci_lower, 0) as human_with_ai_time_mean_ci_lower,
-        coalesce(task_human_with_ai_time_metrics.human_with_ai_time_mean_ci_upper, 0) as human_with_ai_time_mean_ci_upper
+        coalesce(task_human_with_ai_time_metrics.human_with_ai_time_count, 0) as human_with_ai_time_count,
+        coalesce(task_human_with_ai_time_metrics.human_with_ai_time_median, 0) as human_with_ai_time_median,
+        coalesce(task_human_with_ai_time_metrics.human_with_ai_time_stdev, 0) as human_with_ai_time_stdev
+
     from task_work_weights
     inner join task_to_soc
         on task_work_weights.task_name = task_to_soc.task_name
@@ -306,18 +309,22 @@ soc_aggregates as (
         sum(estimated_success_yes_work_count) as successful_task_count,
         sum(estimated_human_only_ability_work_count) as human_only_ability_observation_count,
         sum(estimated_requires_ai_work_count) as requires_ai_task_count,
+        
+        -- AI Autonomy
         sum(estimated_ai_autonomy_work_count) as ai_autonomy_observation_count,
         sum(ai_autonomy_mean * estimated_ai_autonomy_work_count) as ai_autonomy_weighted_sum,
-        sum(ai_autonomy_mean_ci_lower * estimated_ai_autonomy_work_count) as ai_autonomy_ci_lower_weighted_sum,
-        sum(ai_autonomy_mean_ci_upper * estimated_ai_autonomy_work_count) as ai_autonomy_ci_upper_weighted_sum,
+        sum(pow(estimated_ai_autonomy_work_count, 2) * pow(ai_autonomy_stdev, 2) / nullif(ai_autonomy_count, 0)) as ai_autonomy_variance_numerator,
+        
+        -- Human Only Time
         sum(estimated_human_only_time_work_count) as human_only_time_observation_count,
-        sum(human_only_time_mean * estimated_human_only_time_work_count) as human_only_time_weighted_sum,
-        sum(human_only_time_mean_ci_lower * estimated_human_only_time_work_count) as human_only_time_ci_lower_weighted_sum,
-        sum(human_only_time_mean_ci_upper * estimated_human_only_time_work_count) as human_only_time_ci_upper_weighted_sum,
+        sum(human_only_time_median * estimated_human_only_time_work_count) as human_only_time_weighted_sum,
+        sum(pow(estimated_human_only_time_work_count, 2) * pow(human_only_time_stdev, 2) / nullif(human_only_time_count, 0)) as human_only_time_variance_numerator,
+        
+        -- Human With AI Time
         sum(estimated_human_with_ai_time_work_count) as human_with_ai_time_observation_count,
-        sum(human_with_ai_time_mean * estimated_human_with_ai_time_work_count) as human_with_ai_time_weighted_sum,
-        sum(human_with_ai_time_mean_ci_lower * estimated_human_with_ai_time_work_count) as human_with_ai_time_ci_lower_weighted_sum,
-        sum(human_with_ai_time_mean_ci_upper * estimated_human_with_ai_time_work_count) as human_with_ai_time_ci_upper_weighted_sum
+        sum(human_with_ai_time_median * estimated_human_with_ai_time_work_count) as human_with_ai_time_weighted_sum,
+        sum(pow(estimated_human_with_ai_time_work_count, 2) * pow(human_with_ai_time_stdev, 2) / nullif(human_with_ai_time_count, 0)) as human_with_ai_time_variance_numerator
+
     from soc_rollup_inputs
     group by 1, 2, 3, 4, 5, 6, 7, 8
 
@@ -345,18 +352,25 @@ final as (
         task_success_observation_count,
         successful_task_count,
         safe_divide(successful_task_count, task_success_observation_count) as task_success_rate,
+        
+        -- AI Autonomy Aggregations + CIs via Variance Propagation (1.96 * SE)
         ai_autonomy_observation_count,
         safe_divide(ai_autonomy_weighted_sum, ai_autonomy_observation_count) as ai_autonomy_score,
-        safe_divide(ai_autonomy_ci_lower_weighted_sum, ai_autonomy_observation_count) as ai_autonomy_score_ci_lower,
-        safe_divide(ai_autonomy_ci_upper_weighted_sum, ai_autonomy_observation_count) as ai_autonomy_score_ci_upper,
+        safe_divide(ai_autonomy_weighted_sum, ai_autonomy_observation_count) - (1.96 * safe_divide(sqrt(ai_autonomy_variance_numerator), ai_autonomy_observation_count)) as ai_autonomy_score_ci_lower,
+        safe_divide(ai_autonomy_weighted_sum, ai_autonomy_observation_count) + (1.96 * safe_divide(sqrt(ai_autonomy_variance_numerator), ai_autonomy_observation_count)) as ai_autonomy_score_ci_upper,
+        
+        -- Human Only Time Aggregations + CIs via Variance Propagation
         human_only_time_observation_count,
-        safe_divide(human_only_time_weighted_sum, human_only_time_observation_count) as human_only_time_mean,
-        safe_divide(human_only_time_ci_lower_weighted_sum, human_only_time_observation_count) as human_only_time_mean_ci_lower,
-        safe_divide(human_only_time_ci_upper_weighted_sum, human_only_time_observation_count) as human_only_time_mean_ci_upper,
+        safe_divide(human_only_time_weighted_sum, human_only_time_observation_count) as human_only_time_median,
+        safe_divide(human_only_time_weighted_sum, human_only_time_observation_count) - (1.96 * safe_divide(sqrt(human_only_time_variance_numerator), human_only_time_observation_count)) as human_only_time_median_ci_lower,
+        safe_divide(human_only_time_weighted_sum, human_only_time_observation_count) + (1.96 * safe_divide(sqrt(human_only_time_variance_numerator), human_only_time_observation_count)) as human_only_time_median_ci_upper,
+        
+        -- Human With AI Time Aggregations + CIs via Variance Propagation
         human_with_ai_time_observation_count,
-        safe_divide(human_with_ai_time_weighted_sum, human_with_ai_time_observation_count) as human_with_ai_time_mean,
-        safe_divide(human_with_ai_time_ci_lower_weighted_sum, human_with_ai_time_observation_count) as human_with_ai_time_mean_ci_lower,
-        safe_divide(human_with_ai_time_ci_upper_weighted_sum, human_with_ai_time_observation_count) as human_with_ai_time_mean_ci_upper,
+        safe_divide(human_with_ai_time_weighted_sum, human_with_ai_time_observation_count) as human_with_ai_time_median,
+        safe_divide(human_with_ai_time_weighted_sum, human_with_ai_time_observation_count) - (1.96 * safe_divide(sqrt(human_with_ai_time_variance_numerator), human_with_ai_time_observation_count)) as human_with_ai_time_median_ci_lower,
+        safe_divide(human_with_ai_time_weighted_sum, human_with_ai_time_observation_count) + (1.96 * safe_divide(sqrt(human_with_ai_time_variance_numerator), human_with_ai_time_observation_count)) as human_with_ai_time_median_ci_upper,
+        
         human_only_ability_observation_count,
         requires_ai_task_count,
         safe_divide(requires_ai_task_count, human_only_ability_observation_count) as human_only_ability_requires_ai_rate
@@ -384,16 +398,17 @@ select
     ai_autonomy_score_ci_lower,
     ai_autonomy_score_ci_upper,
     human_only_time_observation_count,
-    human_only_time_mean,
-    human_only_time_mean_ci_lower,
-    human_only_time_mean_ci_upper,
+    human_only_time_median,
+    human_only_time_median_ci_lower,
+    human_only_time_median_ci_upper,
     human_with_ai_time_observation_count,
-    human_with_ai_time_mean,
-    human_with_ai_time_mean_ci_lower,
-    human_with_ai_time_mean_ci_upper,
-    1 - safe_divide(human_with_ai_time_mean, human_only_time_mean) as time_savings_ratio,
-    1 - safe_divide(human_with_ai_time_mean_ci_upper, human_only_time_mean_ci_lower) as time_savings_ratio_ci_lower,
-    1 - safe_divide(human_with_ai_time_mean_ci_lower, human_only_time_mean_ci_upper) as time_savings_ratio_ci_upper,
+    human_with_ai_time_median,
+    human_with_ai_time_median_ci_lower,
+    human_with_ai_time_median_ci_upper,
+    -- Ratio using medians, with CIs derived from crossing the new propagated boundaries
+    1 - safe_divide(human_with_ai_time_median, human_only_time_median) as time_savings_ratio,
+    1 - safe_divide(human_with_ai_time_median_ci_upper, human_only_time_median_ci_lower) as time_savings_ratio_ci_lower,
+    1 - safe_divide(human_with_ai_time_median_ci_lower, human_only_time_median_ci_upper) as time_savings_ratio_ci_upper,
     human_only_ability_observation_count,
     requires_ai_task_count,
     human_only_ability_requires_ai_rate
