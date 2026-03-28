@@ -13,7 +13,7 @@ sidebar_position: 2
 	});
 
 	const formatPercentPoints = (value, digits = 1) =>
-		typeof value === 'number' ? `${Math.abs(value).toFixed(digits)} percentage points` : 'n/a';
+		typeof value === 'number' ? `${Math.abs(value).toFixed(digits)}%` : 'n/a';
 
 	let viewportWidth = 1280;
 
@@ -165,7 +165,7 @@ order by share desc, soc_group_display
 </div>
 
 <div class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm">
-	<p class="mb-2 text-sm font-medium text-base-content-muted">Change Since First Release</p>
+	<p class="mb-2 text-sm font-medium text-base-content-muted">Change since first release</p>
 	{#if page2SelectedSummary}
 		<p class="text-sm text-base-content">
 			The usage share for <strong>{page2SelectedSummary.soc_group_display}</strong> is
