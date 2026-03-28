@@ -213,3 +213,8 @@ service-account.json
 logs/
 
 .vscode/
+
+.bruin.yml
+logs/runs
+logs/*.log
+*.py[cod]

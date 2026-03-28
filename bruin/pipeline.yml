@@ -1,0 +1,6 @@
+name: bruin-ai-economic-index
+schedule: daily
+start_date: "2023-03-20"
+
+default_connections:
+    bigquery: "gcp-default"
