@@ -445,6 +445,9 @@ limit 10
     <a href="/usage-share-trends" class="font-medium hover:underline">
         &larr; Prev: Usage Share Trends
     </a>
+    <a href="/explore-more-with-ai-data-analyst" class="font-medium hover:underline sm:text-right">
+        Next: Explore More with AI Data Analyst &rarr;
+    </a>
 </div>
 
 <hr style="margin-top: 20px; opacity: 0.3;"/>
