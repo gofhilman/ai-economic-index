@@ -1,8 +1,8 @@
 {
-  "name": "my-evidence-project",
+  "name": "ai-economic-index",
   "version": "0.0.1",
   "scripts": {
-    "build": "evidence build",
+    "build": "EVIDENCE_BUILD_DIR=./build/ai-economic-index evidence build",
     "build:strict": "evidence build:strict",
     "dev": "evidence dev --open /",
     "test": "evidence build",
