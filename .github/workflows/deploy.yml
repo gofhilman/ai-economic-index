@@ -16,13 +16,6 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: reports/package-lock.json
-      - name: Verify secrets
-        env:
-          AUTHENTICATOR: ${{ secrets.EVIDENCE_SOURCE__BQ__AUTHENTICATOR }}
-          CLIENT_EMAIL: ${{ secrets.EVIDENCE_SOURCE__BQ__CLIENT_EMAIL }}
-        run: |
-          echo "Authenticator length: $(echo $AUTHENTICATOR | wc -c)"
-          echo "Client email: $CLIENT_EMAIL"
       
       - name: Install dependencies
         run: cd reports && npm install
