@@ -31,7 +31,7 @@ sidebar_position: 2
 		tooltip: {
 			trigger: 'item',
 			formatter: (params) =>
-				`${params.name}: ${typeof params.value === 'number' ? `${(params.value * 100).toFixed(1)}%` : 'n/a'}`
+				`${params.name}: ${typeof params.value === 'number' ? `${(params.value * 100).toFixed(1)} pp` : 'n/a'}`
 		},
 		legend: {
 			type: 'scroll',
