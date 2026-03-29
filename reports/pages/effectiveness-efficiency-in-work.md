@@ -26,14 +26,20 @@ sidebar_position: 3
 		typeof value === 'string' && value.length > maxLabelLength ? `${value.slice(0, maxLabelLength - 1)}...` : value;
 
 	$: page3TopTasksFormatted = page3_selected_top_tasks
-		? Array.from(page3_selected_top_tasks).map((row, index) => ({
-				no: index + 1,
-				task:
-					typeof row.task === 'string' && row.task.length > 100
-						? `${row.task.slice(0, 97)}...`
-						: row.task,
-				share: row.share
-		  }))
+		? Array.from(page3_selected_top_tasks).map((row, index) => {
+				const capitalized =
+					typeof row.task === 'string' && row.task.length > 0
+						? row.task.charAt(0).toUpperCase() + row.task.slice(1)
+						: row.task;
+				return {
+					no: index + 1,
+					task:
+						typeof capitalized === 'string' && capitalized.length > 100
+							? `${capitalized.slice(0, 97)}...`
+							: capitalized,
+					share: row.share
+				};
+		  })
 		: [];
 
 	function getPaddedDomain(rows, lowerKey, upperKey, fallbackMin, fallbackMax) {
