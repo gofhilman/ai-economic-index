@@ -13,7 +13,7 @@ sidebar_position: 2
 	});
 
 	const formatPercentPoints = (value, digits = 1) =>
-		typeof value === 'number' ? `${Math.abs(value).toFixed(digits)}%` : 'n/a';
+		typeof value === 'number' ? `${Math.abs(value).toFixed(digits)} pp` : 'n/a';
 
 	let viewportWidth = 1280;
 
@@ -31,7 +31,7 @@ sidebar_position: 2
 		tooltip: {
 			trigger: 'item',
 			formatter: (params) =>
-				`${params.name}: ${typeof params.value === 'number' ? `${(params.value * 100).toFixed(1)} pp` : 'n/a'}`
+				`${params.name}: ${typeof params.value === 'number' ? `${(params.value * 100).toFixed(1)}%` : 'n/a'}`
 		},
 		legend: {
 			type: 'scroll',
