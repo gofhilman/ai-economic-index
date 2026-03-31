@@ -10,6 +10,8 @@ This repository implements the end-to-end data pipeline behind the **AI Economic
 
 - Dashboard: <https://gofhilman.github.io/ai-economic-index/>
 - AI Economic Index with Bruin (Discord): <https://discord.gg/N4RBw6nkwE>
+- Data analysis report: <https://stacked-stories.pages.dev/ai-economic-index-reports-13>
+- Project narrative technical explanation: <https://stacked-stories.pages.dev/ai-economic-index-pipelines-12>
 - Anthropic Economic Index raw dataset: <https://huggingface.co/datasets/Anthropic/EconomicIndex>
 
 ## TL;DR (What this repo does)
